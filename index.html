@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>StILL | 宁静如初</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sky-top: #080e1a;
+            --sky-mid: #0d1f35;
+            --sky-bottom: #1a3a52;
+            --glass: rgba(255,255,255,0.05);
+            --glass-border: rgba(255,255,255,0.09);
+            --glass-hover: rgba(255,255,255,0.10);
+            --amber: rgba(255,160,80,0.22);
+            --amber-border: rgba(255,160,80,0.32);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body, html {
+            height: 100%; overflow: hidden; color: white;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* ── SKY ── */
+        .sky {
+            position: relative; width: 100%; height: 100vh;
+            background: linear-gradient(170deg, var(--sky-top) 0%, var(--sky-mid) 55%, var(--sky-bottom) 100%);
+            display: flex; align-items: center; justify-content: center; gap: 20px;
+        }
+        .city-glow {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 35%;
+            background: radial-gradient(ellipse at 50% 110%, rgba(255,120,50,0.18) 0%, transparent 70%);
+            pointer-events: none; z-index: 0;
+        }
+
+        /* ── RAIN ── */
+        .rain-container { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+        .rain-drop {
+            position: absolute; top: -60px; width: 1px;
+            background: linear-gradient(to bottom, transparent, rgba(180,210,255,0.4));
+            animation: fall linear infinite;
+        }
+        @keyframes fall { to { transform: translateY(110vh); } }
+
+        /* ── TOP BAR ── */
+        .top-bar {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 20; display: flex; align-items: center; gap: 16px;
+        }
+        .app-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.3rem; letter-spacing: 7px; opacity: 0.7;
+        }
+        .btn-settings {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            color: rgba(255,255,255,0.45); border-radius: 9px;
+            padding: 5px 12px; font-size: 0.73rem; cursor: pointer;
+            font-family: inherit; transition: 0.2s;
+        }
+        .btn-settings:hover { background: var(--glass-hover); color: white; }
+
+        /* ── MAIN LAYOUT: unified chat card + task panel ── */
+        .layout {
+            position: relative; z-index: 10;
+            display: flex; gap: 20px; align-items: center;
+            margin-top: 20px; /* offset for title */
+        }
+
+        /* ── UNIFIED CHAT CARD ── */
+        .chat-card {
+            width: 720px; height: 72vh;
+            background: var(--glass);
+            backdrop-filter: blur(28px) saturate(150%);
+            -webkit-backdrop-filter: blur(28px) saturate(150%);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            display: flex; overflow: hidden;
+        }
+
+        /* LEFT: topic sidebar */
+        .topics-sidebar {
+            width: 190px; flex-shrink: 0;
+            border-right: 1px solid var(--glass-border);
+            display: flex; flex-direction: column;
+            padding: 18px 12px; gap: 8px;
+        }
+        .sidebar-label {
+            font-size: 0.65rem; letter-spacing: 2.5px; text-transform: uppercase;
+            opacity: 0.38; padding: 0 4px 10px; border-bottom: 1px solid var(--glass-border);
+            flex-shrink: 0;
+        }
+        .topic-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+        .topic-list::-webkit-scrollbar { width: 2px; }
+        .topic-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+        .topic-item {
+            padding: 9px 10px; border-radius: 10px;
+            font-size: 0.82rem; cursor: pointer; opacity: 0.6;
+            transition: background 0.2s, opacity 0.2s;
+            border: 1px solid transparent; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis;
+        }
+        .topic-item:hover { background: var(--glass-hover); opacity: 0.9; }
+        .topic-item.active { background: rgba(255,255,255,0.1); border-color: var(--glass-border); opacity: 1; }
+
+        .btn-new-topic {
+            background: transparent; border: 1px dashed rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.45); border-radius: 10px;
+            padding: 8px; font-size: 0.78rem; cursor: pointer;
+            font-family: inherit; transition: 0.2s; flex-shrink: 0;
+        }
+        .btn-new-topic:hover { border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.8); }
+
+        /* RIGHT: chat area */
+        .chat-area {
+            flex: 1; display: flex; flex-direction: column; min-width: 0;
+        }
+
+        .chat-header {
+            padding: 14px 18px; border-bottom: 1px solid var(--glass-border);
+            font-size: 0.85rem; opacity: 0.55; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .api-status { font-size: 0.7rem; padding: 3px 10px; border-radius: 20px; }
+        .api-status.set { background: rgba(80,200,120,0.15); color: rgba(130,230,160,0.9); }
+        .api-status.unset { background: rgba(255,100,80,0.12); color: rgba(255,140,120,0.8); }
+
+        .chat-display {
+            flex: 1; overflow-y: auto; padding: 16px 18px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .chat-display::-webkit-scrollbar { width: 3px; }
+        .chat-display::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+        .msg { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 0.87rem; line-height: 1.6; }
+        .msg.ai {
+            background: rgba(255,255,255,0.07);
+            align-self: flex-start; border-radius: 4px 14px 14px 14px;
+        }
+        .msg.user {
+            background: var(--amber); align-self: flex-end;
+            border-radius: 14px 4px 14px 14px; text-align: right;
+        }
+        .msg-label { font-size: 0.65rem; opacity: 0.38; margin-bottom: 4px; }
+
+        .typing-indicator { display: flex; gap: 5px; align-self: flex-start; padding: 12px 14px; }
+        .typing-indicator span {
+            width: 5px; height: 5px; border-radius: 50%;
+            background: rgba(255,255,255,0.35); animation: blink 1.2s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0%,100%{opacity:0.25} 50%{opacity:1} }
+
+        .input-row {
+            display: flex; gap: 8px; padding: 12px 14px;
+            border-top: 1px solid var(--glass-border); flex-shrink: 0;
+        }
+        .input-row input {
+            flex: 1; background: rgba(255,255,255,0.06);
+            border: 1px solid var(--glass-border); border-radius: 11px;
+            color: white; padding: 9px 14px; font-size: 0.87rem;
+            outline: none; font-family: inherit; transition: border-color 0.2s;
+        }
+        .input-row input:focus { border-color: rgba(255,160,80,0.4); }
+        .input-row input::placeholder { color: rgba(255,255,255,0.22); }
+        .btn-send {
+            background: var(--amber); border: 1px solid var(--amber-border);
+            color: white; border-radius: 11px; padding: 9px 18px;
+            font-size: 0.84rem; cursor: pointer; font-family: inherit; transition: 0.2s;
+        }
+        .btn-send:hover { background: rgba(255,160,80,0.35); }
+        .btn-send:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        /* ── TASK PANEL ── */
+        .task-panel {
+            width: 200px; height: 72vh; flex-shrink: 0;
+            background: var(--glass);
+            backdrop-filter: blur(28px) saturate(150%);
+            -webkit-backdrop-filter: blur(28px) saturate(150%);
+            border-radius: 24px; border: 1px solid var(--glass-border);
+            padding: 18px 14px; display: flex; flex-direction: column; gap: 10px;
+        }
+        .task-header {
+            font-size: 0.65rem; letter-spacing: 2.5px; text-transform: uppercase;
+            opacity: 0.38; text-align: center; padding-bottom: 10px;
+            border-bottom: 1px solid var(--glass-border); flex-shrink: 0;
+        }
+        .task-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+        .task-item {
+            padding: 10px 12px; border-radius: 12px;
+            font-size: 0.83rem; position: relative; overflow: hidden;
+            border: 1px solid transparent; transition: 0.2s;
+        }
+        .task-item:hover { border-color: var(--glass-border); }
+        .task-item.completed { opacity: 0.35; text-decoration: line-through; }
+        .progress-fill {
+            position: absolute; top: 0; left: 0; height: 100%;
+            background: rgba(255,160,80,0.17); z-index: 0;
+            transition: width 0.7s cubic-bezier(.4,0,.2,1);
+        }
+        .task-inner { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; }
+        .task-pct { font-size: 0.68rem; opacity: 0.5; }
+
+        .btn-add-task {
+            background: transparent; border: 1px dashed rgba(255,255,255,0.18);
+            color: rgba(255,255,255,0.4); border-radius: 10px; padding: 7px;
+            font-size: 0.76rem; cursor: pointer; font-family: inherit; transition: 0.2s;
+        }
+        .btn-add-task:hover { border-color: rgba(255,255,255,0.38); color: rgba(255,255,255,0.75); }
+
+        .btn-audio {
+            background: transparent; border: 1px solid var(--glass-border);
+            color: rgba(255,255,255,0.45); border-radius: 10px; padding: 7px;
+            font-size: 0.76rem; cursor: pointer; font-family: inherit; transition: 0.2s;
+        }
+        .btn-audio:hover { background: var(--glass-hover); color: white; }
+
+        /* ── API KEY MODAL ── */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(5,10,20,0.85); backdrop-filter: blur(14px);
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.35s;
+        }
+        .modal-overlay.hidden { opacity: 0; pointer-events: none; }
+
+        .modal {
+            background: rgba(12,22,42,0.97); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px; padding: 38px 32px; width: 360px;
+            display: flex; flex-direction: column; gap: 14px;
+            box-shadow: 0 30px 90px rgba(0,0,0,0.7);
+        }
+        .modal h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.6rem; letter-spacing: 4px; text-align: center; opacity: 0.9;
+        }
+        .modal p { font-size: 0.8rem; opacity: 0.45; text-align: center; line-height: 1.65; }
+        .modal label { font-size: 0.7rem; opacity: 0.5; letter-spacing: 1px; }
+        .modal input {
+            width: 100%; background: rgba(255,255,255,0.06);
+            border: 1px solid var(--glass-border); border-radius: 10px;
+            color: white; padding: 10px 14px; font-size: 0.87rem;
+            outline: none; font-family: inherit; transition: border-color 0.2s;
+        }
+        .modal input:focus { border-color: rgba(255,160,80,0.45); }
+        .btn-confirm {
+            background: var(--amber); border: 1px solid var(--amber-border);
+            color: white; border-radius: 12px; padding: 12px;
+            font-size: 0.88rem; cursor: pointer; font-family: inherit; transition: 0.2s;
+        }
+        .btn-confirm:hover { background: rgba(255,160,80,0.38); }
+        .error-msg { color: rgba(255,120,100,0.85); font-size: 0.76rem; text-align: center; }
+        .hint { font-size: 0.68rem !important; opacity: 0.25 !important; }
+    </style>
+</head>
+<body>
+
+<!-- MODAL -->
+<div class="modal-overlay hidden" id="js-modal">
+    <div class="modal">
+        <h2>StILL</h2>
+        <p>输入你的 DeepSeek API Key<br>Key 仅保存在本地浏览器，不会上传</p>
+        <div style="display:flex;flex-direction:column;gap:6px">
+            <label>DEEPSEEK API KEY</label>
+            <input type="password" id="js-key-input" placeholder="sk-..." autocomplete="off">
+        </div>
+        <p id="js-modal-err" class="error-msg" style="display:none"></p>
+        <button class="btn-confirm" id="js-save-key">进入 StILL</button>
+        <p class="hint">没有 Key？前往 platform.deepseek.com 获取</p>
+    </div>
+</div>
+
+<!-- APP -->
+<div class="sky">
+    <div class="rain-container" id="js-rain"></div>
+    <div class="city-glow"></div>
+
+    <div class="top-bar">
+        <div class="app-title">StILL</div>
+        <button class="btn-settings" id="js-open-settings">⚙ API Key</button>
+    </div>
+
+    <div class="layout">
+        <!-- UNIFIED CHAT CARD -->
+        <div class="chat-card">
+            <!-- Sidebar -->
+            <div class="topics-sidebar">
+                <div class="sidebar-label">历史对话</div>
+                <div class="topic-list" id="js-topic-list"></div>
+                <button class="btn-new-topic" id="js-new-topic">＋ 新建话题</button>
+            </div>
+            <!-- Chat -->
+            <div class="chat-area">
+                <div class="chat-header">
+                    <span id="js-current-topic-name">默认话题</span>
+                    <span class="api-status unset" id="js-api-status">未设置 Key</span>
+                </div>
+                <div class="chat-display" id="js-chat-display"></div>
+                <div class="input-row">
+                    <input type="text" id="js-msg-input" placeholder="和我说说你在做什么…" />
+                    <button class="btn-send" id="js-send-btn">发送</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TASK PANEL -->
+        <div class="task-panel">
+            <div class="task-header">进度清单</div>
+            <div class="task-list" id="js-task-list"></div>
+            <button class="btn-add-task" id="js-add-task">＋ 添加任务</button>
+            <button class="btn-audio" id="js-audio-btn">🌧 开启雨声</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ── STATE ──
+let appData = JSON.parse(localStorage.getItem('StILL_DATA')) || {
+    activeTopicId: 't1',
+    topics: {
+        't1': { name: '默认话题', messages: [{ role: 'assistant', content: '你好，我是 StILL。告诉我今天你想完成什么？' }] }
+    },
+    todos: [
+        { id: 'todo-1', title: '论文选题', progress: 0, isCompleted: false },
+        { id: 'todo-2', title: '背单词',   progress: 0, isCompleted: false }
+    ]
+};
+let apiKey = localStorage.getItem('StILL_API_KEY') || '';
+
+function save() { localStorage.setItem('StILL_DATA', JSON.stringify(appData)); }
+
+// ── API STATUS ──
+function refreshStatus() {
+    const el = document.getElementById('js-api-status');
+    el.textContent = apiKey ? '✓ Key 已设置' : '⚠ 未设置 Key';
+    el.className = 'api-status ' + (apiKey ? 'set' : 'unset');
+}
+
+// ── MODAL ──
+const modal = document.getElementById('js-modal');
+const keyInput = document.getElementById('js-key-input');
+
+function openModal() {
+    keyInput.value = apiKey;
+    document.getElementById('js-modal-err').style.display = 'none';
+    modal.classList.remove('hidden');
+    keyInput.focus();
+}
+if (!apiKey) openModal();
+
+document.getElementById('js-open-settings').onclick = openModal;
+
+document.getElementById('js-save-key').onclick = () => {
+    const val = keyInput.value.trim();
+    const errEl = document.getElementById('js-modal-err');
+    if (!val) { errEl.style.display = 'block'; errEl.textContent = '请输入 API Key'; return; }
+    if (!val.startsWith('sk-')) { errEl.style.display = 'block'; errEl.textContent = 'Key 格式不正确，应以 sk- 开头'; return; }
+    apiKey = val;
+    localStorage.setItem('StILL_API_KEY', apiKey);
+    modal.classList.add('hidden');
+    refreshStatus();
+};
+keyInput.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('js-save-key').click(); });
+
+// ── 填入你的 Cloudflare Worker 地址 ──
+const PROXY_URL = 'https://your-worker-name.your-name.workers.dev';
+
+// ── DEEPSEEK via Cloudflare Worker ──
+async function callAI(messages) {
+    const SYSTEM = `你是 StILL，一个沉浸式专注助手，语气简洁温和。
+用户当前任务列表（JSON）：${JSON.stringify(appData.todos)}
+
+当你判断用户说的话影响了某个任务的进度时，在回复末尾附上：
+[TASK_UPDATE]{"id":"todo-x","progress":数字0-100,"isCompleted":true或false}[/TASK_UPDATE]
+仅在确有变化时才输出这个块，其余时间正常回复。`;
+
+    const res = await fetch(PROXY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            apiKey,
+            model: 'deepseek-chat',
+            messages: [
+                { role: 'system', content: SYSTEM },
+                ...messages.map(m => ({ role: m.role, content: m.content }))
+            ],
+            temperature: 0.7,
+            max_tokens: 500
+        })
+    });
+
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    return data.choices[0].message.content;
+}
+
+function applyTaskUpdate(text) {
+    const m = text.match(/\[TASK_UPDATE\]([\s\S]*?)\[\/TASK_UPDATE\]/);
+    if (m) {
+        try {
+            const u = JSON.parse(m[1]);
+            const t = appData.todos.find(t => t.id === u.id);
+            if (t) { t.progress = Math.min(100, Math.max(0, u.progress)); t.isCompleted = u.isCompleted; }
+        } catch(e) {}
+    }
+    return text.replace(/\[TASK_UPDATE\][\s\S]*?\[\/TASK_UPDATE\]/, '').trim();
+}
+
+// ── RENDER ──
+const UI = {
+    render() { this.renderTopics(); this.renderChat(); this.renderTasks(); save(); },
+
+    renderTopics() {
+        const c = document.getElementById('js-topic-list');
+        const ids = Object.keys(appData.topics);
+        c.innerHTML = ids.map(id => `
+            <div class="topic-item ${id === appData.activeTopicId ? 'active' : ''}"
+                 onclick="UI.switchTopic('${id}')" title="${appData.topics[id].name}">
+                ${appData.topics[id].name}
+            </div>
+        `).join('');
+        document.getElementById('js-current-topic-name').textContent =
+            appData.topics[appData.activeTopicId]?.name || '';
+    },
+
+    renderChat() {
+        const d = document.getElementById('js-chat-display');
+        const msgs = appData.topics[appData.activeTopicId]?.messages || [];
+        d.innerHTML = msgs.map(m => `
+            <div class="msg ${m.role === 'assistant' ? 'ai' : 'user'}">
+                <div class="msg-label">${m.role === 'assistant' ? 'StILL' : '你'}</div>
+                ${m.content}
+            </div>
+        `).join('');
+        d.scrollTop = d.scrollHeight;
+    },
+
+    renderTasks() {
+        const c = document.getElementById('js-task-list');
+        c.innerHTML = appData.todos.map(t => `
+            <div class="task-item ${t.isCompleted ? 'completed' : ''}">
+                <div class="progress-fill" style="width:${t.progress}%"></div>
+                <div class="task-inner">
+                    <span>${t.title}</span>
+                    ${t.progress > 0 ? `<span class="task-pct">${t.progress}%</span>` : ''}
+                </div>
+            </div>
+        `).join('');
+    },
+
+    switchTopic(id) { appData.activeTopicId = id; this.render(); },
+
+    showTyping() {
+        const d = document.getElementById('js-chat-display');
+        const el = document.createElement('div');
+        el.className = 'typing-indicator'; el.id = 'js-typing';
+        el.innerHTML = '<span></span><span></span><span></span>';
+        d.appendChild(el); d.scrollTop = d.scrollHeight;
+    },
+
+    hideTyping() { document.getElementById('js-typing')?.remove(); }
+};
+
+// ── SEND ──
+async function handleSend() {
+    if (!apiKey) { openModal(); return; }
+    const input = document.getElementById('js-msg-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    const topic = appData.topics[appData.activeTopicId];
+    topic.messages.push({ role: 'user', content: msg });
+    input.value = '';
+
+    const btn = document.getElementById('js-send-btn');
+    btn.disabled = true;
+    UI.render();
+    UI.showTyping();
+
+    try {
+        const raw = await callAI(topic.messages);
+        UI.hideTyping();
+        const reply = applyTaskUpdate(raw);
+        topic.messages.push({ role: 'assistant', content: reply });
+    } catch(e) {
+        UI.hideTyping();
+        topic.messages.push({ role: 'assistant', content: `⚠ 请求失败：${e.message}` });
+    }
+
+    btn.disabled = false;
+    UI.render();
+}
+
+document.getElementById('js-send-btn').onclick = handleSend;
+document.getElementById('js-msg-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+});
+
+// ── NEW TOPIC ──
+document.getElementById('js-new-topic').onclick = () => {
+    const id = 't' + Date.now();
+    const n = '话题 ' + (Object.keys(appData.topics).length + 1);
+    appData.topics[id] = { name: n, messages: [{ role: 'assistant', content: '新话题开始，告诉我你的计划。' }] };
+    appData.activeTopicId = id;
+    UI.render();
+};
+
+// ── ADD TASK ──
+document.getElementById('js-add-task').onclick = () => {
+    const name = prompt('新任务名称：');
+    if (!name?.trim()) return;
+    appData.todos.push({ id: 'todo-' + Date.now(), title: name.trim(), progress: 0, isCompleted: false });
+    UI.render();
+};
+
+// ── AUDIO ──
+const audio = new Audio('https://cdn.pixabay.com/audio/2022/10/13/audio_347f8b3b5a.mp3');
+audio.loop = true; audio.volume = 0;
+let audioPlaying = false;
+
+function fadeAudio(target, cb) {
+    const step = audio.volume < target ? 0.03 : -0.03;
+    const t = setInterval(() => {
+        let next = audio.volume + step;
+        if ((step > 0 && next >= target) || (step < 0 && next <= target)) {
+            audio.volume = Math.max(0, Math.min(1, target));
+            clearInterval(t); if (cb) cb();
+        } else { audio.volume = Math.max(0, Math.min(1, next)); }
+    }, 50);
+}
+
+document.getElementById('js-audio-btn').onclick = function() {
+    if (!audioPlaying) {
+        audio.play().catch(() => {});
+        audioPlaying = true;
+        this.textContent = '⏸ 关闭雨声';
+        fadeAudio(0.5);
+    } else {
+        fadeAudio(0, () => { audio.pause(); audioPlaying = false; });
+        this.textContent = '🌧 开启雨声';
+    }
+};
+
+// ── RAIN ──
+const rainContainer = document.getElementById('js-rain');
+for (let i = 0; i < 70; i++) {
+    const d = document.createElement('div');
+    d.className = 'rain-drop';
+    d.style.cssText = `left:${Math.random()*100}vw;height:${Math.random()*55+25}px;opacity:${Math.random()*0.3+0.04};animation-duration:${Math.random()*0.7+0.4}s;animation-delay:${Math.random()*3}s`;
+    rainContainer.appendChild(d);
+}
+
+// ── INIT ──
+UI.render();
+refreshStatus();
+</script>
+</body>
+</html>
