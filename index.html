@@ -558,7 +558,7 @@ body,html{height:100%;overflow:hidden;color:white;font-family:'DM Sans',sans-ser
 .note-text{font-size:0.74rem;color:rgba(255,255,255,0.75);line-height:1.55;word-break:break-all}
 .note-del{position:absolute;top:5px;right:6px;background:transparent;border:none;color:rgba(255,80,60,0.35);font-size:0.7rem;cursor:pointer;opacity:0;transition:0.15s;padding:1px 3px}
 .note-item:hover .note-del{opacity:1}
-.note-input-row{display:flex;gap:6px;padding:8px 12px;flex-shrink:0;border-top:1px solid var(--glass-b);align-items:flex-end}
+.note-input-row{display:flex;gap:6px;padding:8px 8px;flex-shrink:0;border-top:1px solid var(--glass-b);align-items:center}
 .note-input{flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--glass-b);border-radius:8px;color:white;font-size:0.72rem;padding:4px 8px;outline:none;font-family:inherit;resize:none;height:28px;min-height:28px;max-height:80px;overflow-y:auto;line-height:1.4}
 .note-input::placeholder{color:rgba(255,255,255,0.2)}
 .note-input:focus{border-color:rgba(255,160,80,0.3)}
@@ -580,7 +580,7 @@ body,html{height:100%;overflow:hidden;color:white;font-family:'DM Sans',sans-ser
 .bill-item-edit:hover{color:rgba(255,200,120,0.8)}
 .bill-del{position:absolute;top:4px;right:5px;background:transparent;border:none;color:rgba(255,80,60,0.3);font-size:0.65rem;cursor:pointer;opacity:0;transition:0.15s;padding:1px 2px}
 .bill-item:hover .bill-del{opacity:1}
-.bill-add-row{display:flex;gap:4px;padding:8px 8px;flex-shrink:0;border-top:1px solid var(--glass-b);align-items:flex-end}
+.bill-add-row{display:flex;gap:4px;padding:8px 8px;flex-shrink:0;border-top:1px solid var(--glass-b);align-items:center}
 .bill-add-btn{flex:1;background:rgba(120,200,160,0.1);border:1px solid rgba(120,200,160,0.2);color:rgba(120,210,160,0.7);border-radius:7px;font-size:0.72rem;padding:0 4px;height:28px;cursor:pointer;font-family:inherit;transition:0.15s}
 .bill-add-btn:hover{background:rgba(120,200,160,0.2);color:rgba(120,210,160,0.95)}
 
@@ -675,6 +675,40 @@ body,html{height:100%;overflow:hidden;color:white;font-family:'DM Sans',sans-ser
 .cl-item{font-size:0.7rem;color:rgba(255,255,255,0.5);line-height:1.6;padding-left:10px;position:relative}
 .cl-item::before{content:'·';position:absolute;left:0;opacity:0.4}
 .cl-divider{border:none;border-top:1px solid var(--glass-b);margin:0}
+
+/* 新人指引入口按钮 */
+.guide-entry-btn{width:100%;background:rgba(255,160,80,0.1);border:1px solid rgba(255,160,80,0.25);color:rgba(255,200,120,0.8);border-radius:9px;padding:9px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:inherit;transition:0.15s}
+.guide-entry-btn:hover{background:rgba(255,160,80,0.22);color:rgba(255,220,140,0.95)}
+/* 指引模态框 */
+.guide-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:600;display:none;backdrop-filter:blur(3px)}
+.guide-overlay.show{display:block}
+.guide-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.96);z-index:601;width:320px;max-width:calc(100vw - 32px);background:rgba(10,16,36,0.97);border:1px solid rgba(255,255,255,0.1);border-radius:18px;display:none;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.6);transition:transform 0.25s cubic-bezier(.4,0,.2,1),opacity 0.2s}
+.guide-modal.show{display:flex;transform:translate(-50%,-50%) scale(1)}
+.guide-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 0}
+.guide-step-label{font-size:0.55rem;letter-spacing:3px;opacity:0.28;text-transform:uppercase}
+.guide-close{background:transparent;border:none;color:rgba(255,255,255,0.3);font-size:0.9rem;cursor:pointer;padding:0;line-height:1;transition:0.15s}
+.guide-close:hover{color:rgba(255,255,255,0.7)}
+.guide-slides{flex:1;overflow:hidden;position:relative;min-height:280px}
+.guide-slide{position:absolute;inset:0;padding:20px 22px 10px;display:flex;flex-direction:column;gap:10px;opacity:0;transform:translateX(30px);transition:opacity 0.28s ease,transform 0.28s ease;pointer-events:none}
+.guide-slide.active{opacity:1;transform:translateX(0);pointer-events:auto}
+.guide-slide.exit{opacity:0;transform:translateX(-30px)}
+.guide-icon{font-size:2rem;line-height:1;margin-bottom:4px}
+.guide-title{font-size:1rem;color:rgba(255,255,255,0.9);font-weight:500;letter-spacing:0.5px}
+.guide-desc{font-size:0.72rem;color:rgba(255,255,255,0.48);line-height:1.75}
+.guide-tips{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+.guide-tip{font-size:0.68rem;color:rgba(255,255,255,0.38);padding-left:10px;position:relative;line-height:1.6}
+.guide-tip::before{content:'·';position:absolute;left:0;color:rgba(255,160,80,0.5)}
+.guide-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 18px 16px;border-top:1px solid rgba(255,255,255,0.06)}
+.guide-dots{display:flex;gap:5px}
+.guide-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.15);transition:0.2s;cursor:pointer}
+.guide-dot.active{background:rgba(255,200,100,0.8);width:14px;border-radius:3px}
+.guide-nav{display:flex;gap:6px;align-items:center}
+.guide-btn-prev{background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.35);border-radius:8px;padding:5px 10px;font-size:0.68rem;cursor:pointer;font-family:inherit;transition:0.15s}
+.guide-btn-prev:hover{border-color:rgba(255,255,255,0.25);color:rgba(255,255,255,0.6)}
+.guide-btn-next{background:rgba(255,160,80,0.18);border:1px solid rgba(255,160,80,0.3);color:rgba(255,200,120,0.9);border-radius:8px;padding:5px 14px;font-size:0.68rem;cursor:pointer;font-family:inherit;transition:0.15s}
+.guide-btn-next:hover{background:rgba(255,160,80,0.32)}
+
+@keyframes tdot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
 </style>
 </head>
 <body>
@@ -792,7 +826,30 @@ body,html{height:100%;overflow:hidden;color:white;font-family:'DM Sans',sans-ser
     <button class="btn-close-drawer" onclick="closeChangelog()">关闭</button>
   </div>
   <div style="flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:18px" id="js-changelog-body"></div>
+  <div style="padding:14px 20px;border-top:1px solid var(--glass-b);flex-shrink:0">
+    <button class="guide-entry-btn" onclick="openGuide()">✦ 新人指引</button>
+  </div>
 </div>
+
+
+<!-- 新人指引 -->
+<div class="guide-overlay" id="js-guide-overlay" onclick="closeGuide()"></div>
+<div class="guide-modal" id="js-guide-modal">
+  <div class="guide-header">
+    <div class="guide-step-label" id="js-guide-step-label">01 / 06</div>
+    <button class="guide-close" onclick="closeGuide()">✕</button>
+  </div>
+  <div class="guide-slides" id="js-guide-slides"></div>
+  <div class="guide-footer">
+    <div class="guide-dots" id="js-guide-dots"></div>
+    <div class="guide-nav">
+      <button class="guide-btn-prev" id="js-guide-prev" onclick="guidePrev()">←</button>
+      <button class="guide-btn-next" id="js-guide-next" onclick="guideNext()">→ 下一步</button>
+    </div>
+  </div>
+</div>
+
+
 
 <!-- 悬浮废纸篓 -->
 <div class="note-floater" id="js-note-floater">
@@ -953,6 +1010,9 @@ body,html{height:100%;overflow:hidden;color:white;font-family:'DM Sans',sans-ser
   <div class="city-glow"></div>
 
   <!-- Top-left -->
+  <!-- 教程退出按钮 -->
+  <button id="js-tut-exit-btn" onclick="closeTutorial()" style="display:none;position:fixed;top:14px;right:18px;z-index:800;background:rgba(255,60,60,0.12);border:1px solid rgba(255,80,60,0.3);color:rgba(255,120,100,0.8);border-radius:9px;padding:5px 13px;font-size:0.65rem;letter-spacing:1px;cursor:pointer;font-family:inherit;transition:0.15s;backdrop-filter:blur(6px)">✕ 退出指引</button>
+
   <div class="corner-tl">
     <div class="app-title" id="js-open-changelog" onclick="openChangelog()" style="cursor:pointer">
       StIL<span style="position:relative;display:inline-block">L<span class="changelog-dot" id="js-changelog-dot"></span></span>
@@ -1579,11 +1639,12 @@ document.getElementById('js-imm-input').addEventListener('keydown',e=>{ if(e.key
 // AI CALL
 // ══════════════════════════════════════════════
 function getSystem() {
-  const todosJson = JSON.stringify(appData.todos.map(t=>({
-    id:t.id, title:t.title, progress:t.progress,
-    isCompleted:t.isCompleted,
-    subtasks:(t.subtasks||[]).map(s=>({id:s.id,title:s.title,done:s.done,weight:s.weight}))
-  })));
+  const todosJson = JSON.stringify(appData.todos.map(t=>
+    t.isActive
+      ? { id:t.id, title:t.title, progress:t.progress, isCompleted:t.isCompleted, isActive:true,
+          subtasks:(t.subtasks||[]).map(s=>({id:s.id,title:s.title,done:s.done,weight:s.weight})) }
+      : { id:t.id, title:t.title, progress:t.progress, isCompleted:t.isCompleted }
+  ));
   return `你是 StILL，一个温和专注的 AI 陪伴助手。说话简洁，像靠谱的朋友，不啰嗦。
 
 当前任务清单：${todosJson}
@@ -1830,7 +1891,7 @@ const UI={
   },
 
   renderTasks(){
-    const sorted=[...appData.todos].sort((a,b)=>{
+    const sorted=[...appData.todos].filter(t=>!t._tutHidden).sort((a,b)=>{
       if(a.isActive&&!b.isActive)return-1;if(!a.isActive&&b.isActive)return 1;
       if(a.isCompleted!==b.isCompleted)return a.isCompleted?1:-1;
       return b.progress-a.progress;
@@ -1879,6 +1940,8 @@ const UI={
     appData.todos.forEach(x=>{x.isActive=false;});
     t.isActive=true;
     this.render();
+    // 教程模式：只切换任务，不调用 AI
+    if(tutRunning) return;
     const topic=appData.topics[appData.activeTopicId];
     topic.messages.push({role:'user',content:`切换到「${t.title}」`});
     this.render();
@@ -1951,7 +2014,19 @@ async function callAIAndRespond(userOverride, topic, immersive=false, isFirstMsg
   UI.showTyping(immersive);
   try{
     // 构造发给 AI 的消息列表（去掉 milestone，可能附加 override）
-    const msgs = topic.messages.filter(m=>m.role!=='milestone');
+    const allMsgs = topic.messages.filter(m=>m.role!=='milestone');
+    // 滑动窗口：保留首条开场白 + 最近 20 条，避免长对话 token 爆炸
+    const WINDOW = 20;
+    let msgs;
+    if (allMsgs.length <= WINDOW) {
+      msgs = allMsgs;
+    } else {
+      const first = allMsgs[0]; // 开场白（assistant）
+      const recent = allMsgs.slice(-WINDOW);
+      // 若 recent 已含首条则直接用，否则拼上首条
+      msgs = recent[0] === first ? recent : [first, ...recent];
+    }
+    msgs = [...msgs]; // 浅拷贝，避免 push 污染原数组
     if(userOverride) msgs.push({role:'user', content:userOverride});
     const raw = await callAI(msgs);
     UI.hideTyping();
@@ -2092,9 +2167,15 @@ window.openTimerPicker=openTimerPicker;
 
 // 清空按钮（不经过 AI，直接执行）
 document.getElementById('js-clear-all').onclick=()=>{
-  if(!appData.todos.length){return;}
-  if(!confirm(`清除全部 ${appData.todos.length} 个任务？`))return;
-  appData.todos=[];
+  const visible = appData.todos.filter(t=>!t._tutHidden);
+  if(!visible.length){return;}
+  if(!confirm(`清除全部 ${visible.length} 个任务？`))return;
+  // 教程中：只删除可见任务，保留隐藏任务
+  if(tutRunning){
+    appData.todos = appData.todos.filter(t=>t._tutHidden);
+  } else {
+    appData.todos=[];
+  }
   save(); UI.render();
 };
 
@@ -2275,7 +2356,10 @@ refreshStatus();
 
   // Inject a system-triggered greeting via AI
   const greetMsg = [{role:'user', content:`[SYSTEM_GREETING] ${greetCtx}`}];
-  const tempMsgs = [...(topic.messages.filter(m=>m.role!=='milestone')), ...greetMsg];
+  const _greetAll = topic.messages.filter(m=>m.role!=='milestone');
+  const _greetWin = _greetAll.length <= 20 ? _greetAll
+    : [_greetAll[0], ..._greetAll.slice(-20)];
+  const tempMsgs = [..._greetWin, ...greetMsg];
 
   // Show typing and request greeting
   setTimeout(async () => {
@@ -2579,6 +2663,7 @@ function calDblClickDate(ds) {
 
 // ── AI 通知 ─────────────────────────────────────────────────
 function notifyAiCountdownAdded(cd) {
+  if (tutRunning) return;  // 教程期间不唤醒 AI
   const days = cdDaysLeft(cd);
   const daysTxt = days===0?'就是今天':days>0?`${days}天后（${cd.date}）`:`已过去${-days}天`;
   const repeatTxt = cd.repeat==='once'?'仅此一次':{'yearly':'每年重复','monthly':'每月重复','weekly':'每周重复'}[cd.repeat];
@@ -3098,6 +3183,11 @@ function renderNoteList() {
 
 async function sendNote(text) {
   if (!text.trim()) return;
+  // 教程期间：直接交由教程处理，不调 AI
+  if (tutRunning && _tutNoteCallback) {
+    tutInterceptNote(text.trim());
+    return;
+  }
   const ds = todayKey();
   if (!appData.notes[ds]) appData.notes[ds] = [];
   const note = { id:journalNewId(), time:nowTimeStr(), text:text.trim(), isBill:false };
@@ -3332,9 +3422,22 @@ document.addEventListener('mousedown', e=>{
 // ▼▼▼ 修改这里来发布新版本 ▼▼▼
 // 每次更新：1. 在 CHANGELOG 数组最前面加一条新记录
 //           2. 把 CHANGELOG_LATEST_VERSION 改成新版本号
-var CHANGELOG_LATEST_VERSION = 'v0.1.1';
+var CHANGELOG_LATEST_VERSION = 'v0.1.2';
 
 var CHANGELOG = [
+  {
+    version: 'v0.1.2',
+    date: '2026-03-09',
+    title: '实操教程 & 性能优化',
+    items: [
+      '✦ 新手引导后可进入实操教程，直接在真实界面上手操作',
+      '教程分三章：任务管理 · 倒数日 · 手账，可单独选择任意章节',
+      '章节完成状态持久记录，未完成章节随时回来继续',
+      '教程期间所有数据与对话完全隔离，退出后自动清除不影响真实数据',
+      '⚡ 优化：AI 上下文滑动窗口，长对话 token 消耗降低约 70%',
+      '⚡ 优化：任务清单只向 AI 传入当前激活任务的子任务详情，减少 system prompt 体积',
+    ]
+  },
   {
     version: 'v0.1.1',
     date: '2026-03-09',
@@ -3402,6 +3505,819 @@ function checkChangelogDot() {
     document.getElementById('js-changelog-dot').classList.add('show');
   }
 }
+
+
+// ══════════════════════════════════════════════
+// 新人指引
+// ══════════════════════════════════════════════
+var GUIDE_STEPS = [
+  {
+    icon: '✦',
+    title: '欢迎使用 StILL',
+    desc: '一个安静的 AI 助理空间。\n\n在这里你可以与 AI 对话来管理任务、记录生活、保持专注。',
+    tips: []
+  },
+  {
+    icon: '💬',
+    title: '对话与任务',
+    desc: '直接用自然语言和 AI 对话，AI 会自动理解并创建任务、拆分步骤、追踪进度。',
+    tips: [
+      '说"帮我写一篇报告"，AI 会拆出子任务',
+      '完成某步后告诉 AI，进度自动更新',
+      '左侧可切换不同话题的对话',
+    ]
+  },
+  {
+    icon: '⏱',
+    title: '专注计时器',
+    desc: '鼠标悬浮在任务清单上即可点击计时器进入专注模式，沉浸任务不被打扰。',
+    tips: [
+      '计时器记录每日专注时长',
+      '热力日历可查看历史专注情况',
+      '按 ESC 或点击退出沉浸模式',
+    ]
+  },
+  {
+    icon: '📅',
+    title: '倒数日与日历',
+    desc: '点击左上角 📅 打开日历热力图，双击日期可添加倒数日。',
+    tips: [
+      '倒数日支持一次性或周期重复',
+      '悬浮卡片可拖拽到任意位置',
+      '热力颜色深浅代表当天专注时长',
+    ]
+  },
+  {
+    icon: '📝',
+    title: '手账',
+    desc: '点击左上角 📝 打开手账，账单记录和碎碎念都从这里输入，不占用主对话界面。',
+    tips: [
+      'AI 自动识别消费/收入并入账',
+      '计划和预期归入碎碎念，不计入账单',
+      '心情晴雨表记录每日情绪走势',
+      '账单柱状图可视化每日收支',
+    ]
+  },
+  {
+    icon: '🌧',
+    title: '氛围与音乐',
+    desc: '右下角可开启雨声氛围，搭配音乐播放器，营造专属的安静角落。',
+    tips: [
+      '雨声与音乐可同时播放',
+      '沉浸模式下控件自动适配',
+    ]
+  },
+];
+
+var guideIndex = 0;
+
+function openGuide() {
+  closeChangelog();
+  guideIndex = 0;
+  const slides = document.getElementById('js-guide-slides');
+  slides.innerHTML = GUIDE_STEPS.map((s, i) => `
+    <div class="guide-slide ${i===0?'active':''}" id="gs-${i}">
+      <div class="guide-icon">${s.icon}</div>
+      <div class="guide-title">${s.title}</div>
+      <div class="guide-desc">${s.desc.replace(/\n/g,'<br>')}</div>
+      ${s.tips.length ? '<div class="guide-tips">'+s.tips.map(t=>`<div class="guide-tip">${t}</div>`).join('')+'</div>' : ''}
+    </div>`).join('');
+  renderGuideDots();
+  updateGuideNav();
+  document.getElementById('js-guide-overlay').classList.add('show');
+  document.getElementById('js-guide-modal').classList.add('show');
+}
+
+function closeGuide() {
+  document.getElementById('js-guide-overlay').classList.remove('show');
+  document.getElementById('js-guide-modal').classList.remove('show');
+}
+
+function renderGuideDots() {
+  const dotsEl = document.getElementById('js-guide-dots');
+  dotsEl.innerHTML = GUIDE_STEPS.map((_, i) =>
+    `<div class="guide-dot ${i===guideIndex?'active':''}" onclick="guideGoto(${i})"></div>`
+  ).join('');
+}
+
+function updateGuideNav() {
+  const total = GUIDE_STEPS.length;
+  document.getElementById('js-guide-step-label').textContent =
+    String(guideIndex+1).padStart(2,'0') + ' / ' + String(total).padStart(2,'0');
+  document.getElementById('js-guide-prev').style.opacity = guideIndex === 0 ? '0.3' : '1';
+  document.getElementById('js-guide-prev').disabled = guideIndex === 0;
+  const nextBtn = document.getElementById('js-guide-next');
+  if (guideIndex === total-1) {
+    nextBtn.textContent = '▶ 开始实操';
+    nextBtn.onclick = function(){ closeGuide(); openTutorialSelect(); };
+  } else {
+    nextBtn.textContent = '→ 下一步';
+    nextBtn.onclick = guideNext;
+  }
+}
+
+function guideGoto(idx) {
+  const prev = document.getElementById('gs-'+guideIndex);
+  if (prev) { prev.classList.remove('active'); prev.classList.add('exit'); setTimeout(()=>prev.classList.remove('exit'),300); }
+  guideIndex = idx;
+  const next = document.getElementById('gs-'+guideIndex);
+  if (next) next.classList.add('active');
+  renderGuideDots();
+  updateGuideNav();
+}
+
+function guideNext() {
+  if (guideIndex >= GUIDE_STEPS.length - 1) { closeGuide(); return; }
+  guideGoto(guideIndex + 1);
+}
+
+function guidePrev() {
+  if (guideIndex <= 0) return;
+  guideGoto(guideIndex - 1);
+}
+
+
+
+// ══════════════════════════════════════════════
+// 实操教程（直接操作真实 UI）
+// ══════════════════════════════════════════════
+
+var tutRunning = false;
+var tutMsgIds  = [];   // 教程期间注入的消息，结束后清除
+var tutTodoIds = [];   // 教程期间添加的任务 id
+
+// ── 小工具 ────────────────────────────────────
+function tutInjectAI(text) {
+  const topic = appData.topics[appData.activeTopicId];
+  const msg = { role:'assistant', content: text, _tut: true };
+  topic.messages.push(msg);
+  UI.renderChat();
+  const d = document.getElementById('js-chat-display');
+  d.scrollTop = d.scrollHeight;
+}
+
+function tutInjectUser(text) {
+  const topic = appData.topics[appData.activeTopicId];
+  topic.messages.push({ role:'user', content: text, _tut: true });
+  UI.renderChat();
+  const d = document.getElementById('js-chat-display');
+  d.scrollTop = d.scrollHeight;
+}
+
+function tutDelay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// 锁住输入框，替换发送按钮行为
+function tutLockInput(presetText, onSend) {
+  const input = document.getElementById('js-msg-input');
+  const btn   = document.getElementById('js-send-btn');
+  input.value = presetText || '';
+  input.readOnly = true;
+  input.style.color = 'rgba(255,200,120,0.85)';
+  input.style.borderColor = 'rgba(255,160,80,0.35)';
+  btn.disabled = !presetText;
+  // 覆盖发送
+  btn._tutHandler = () => {
+    if (!input.value.trim()) return;
+    tutInjectUser(input.value.trim());
+    input.value = '';
+    input.readOnly = true;
+    btn.disabled = true;
+    btn.onclick = null;
+    if (onSend) onSend();
+  };
+  btn.onclick = btn._tutHandler;
+  document.getElementById('js-msg-input')._tutKeyHandler = e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (btn._tutHandler) btn._tutHandler(); }
+  };
+  input.addEventListener('keydown', input._tutKeyHandler);
+}
+
+// 恢复输入框
+function tutUnlockInputReal() {
+  const input = document.getElementById('js-msg-input');
+  const btn   = document.getElementById('js-send-btn');
+  input.readOnly = false;
+  input.value = '';
+  input.style.color = '';
+  input.style.borderColor = '';
+  btn.disabled = false;
+  btn.onclick = () => handleSend(false);
+  if (input._tutKeyHandler) {
+    input.removeEventListener('keydown', input._tutKeyHandler);
+    delete input._tutKeyHandler;
+  }
+  delete btn._tutHandler;
+}
+
+// 显示提示横条（输入框下方）
+var tutHintEl = null;
+function tutShowHint(text) {
+  if (!tutHintEl) {
+    tutHintEl = document.createElement('div');
+    tutHintEl.id = 'js-tut-hint-bar';
+    tutHintEl.style.cssText = 'text-align:center;font-size:0.62rem;color:rgba(255,200,100,0.55);padding:4px 0 6px;letter-spacing:0.5px;transition:opacity 0.3s';
+    const inputArea = document.getElementById('js-send-btn').parentElement;
+    inputArea.parentElement.insertBefore(tutHintEl, inputArea.nextSibling);
+  }
+  tutHintEl.textContent = text;
+  tutHintEl.style.opacity = '1';
+}
+function tutHideHint() {
+  if (tutHintEl) tutHintEl.style.opacity = '0';
+}
+
+// 显示行动按钮（在聊天区末尾）
+function tutShowActionBtns(actions) {
+  return new Promise(resolve => {
+    const d = document.getElementById('js-chat-display');
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 2px;animation:msgIn 0.2s ease';
+    row.className = '_tut-action-row';
+    actions.forEach(a => {
+      const btn = document.createElement('button');
+      btn.style.cssText = 'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);border-radius:8px;padding:5px 13px;font-size:0.7rem;cursor:pointer;font-family:inherit;transition:0.15s';
+      btn.onmouseover = () => { btn.style.background='rgba(255,160,80,0.15)';btn.style.borderColor='rgba(255,160,80,0.3)';btn.style.color='rgba(255,200,120,0.9)'; };
+      btn.onmouseout  = () => { btn.style.background='rgba(255,255,255,0.06)';btn.style.borderColor='rgba(255,255,255,0.12)';btn.style.color='rgba(255,255,255,0.6)'; };
+      btn.textContent = a.label;
+      btn.onclick = () => {
+        tutInjectUser(a.label);
+        row.remove();
+        resolve(a.key || a.label);
+      };
+      row.appendChild(btn);
+    });
+    d.appendChild(row);
+    d.scrollTop = d.scrollHeight;
+  });
+}
+
+// 打字动画（在聊天区末尾显示 ... 再替换成消息）
+async function tutAISay(text, delayMs = 800) {
+  // 打字指示器
+  const d = document.getElementById('js-chat-display');
+  const typing = document.createElement('div');
+  typing.className = 'msg ai _tut-typing';
+  typing.innerHTML = '<div style="display:flex;gap:4px;padding:4px 2px;align-items:center"><span style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.3);display:inline-block;animation:tdot 1.2s infinite"></span><span style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.3);display:inline-block;animation:tdot 1.2s 0.2s infinite"></span><span style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.3);display:inline-block;animation:tdot 1.2s 0.4s infinite"></span></div>';
+  d.appendChild(typing);
+  d.scrollTop = d.scrollHeight;
+  await tutDelay(delayMs);
+  typing.remove();
+  tutInjectAI(text);
+}
+
+// 章节过渡卡
+async function tutChapterCard(icon, title, sub, btnText) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.className = '_tut-chapter-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(4,8,20,0.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+    overlay.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:40px;text-align:center;max-width:300px">
+        <div style="font-size:2.8rem;line-height:1">${icon}</div>
+        <div style="font-size:1.3rem;color:rgba(255,255,255,0.88);letter-spacing:2px;font-weight:500">${title}</div>
+        <div style="font-size:0.73rem;color:rgba(255,255,255,0.36);line-height:1.75">${sub}</div>
+        <button id="_tut-ch-btn" style="margin-top:8px;background:rgba(255,160,80,0.18);border:1px solid rgba(255,160,80,0.35);color:rgba(255,200,120,0.9);border-radius:10px;padding:10px 32px;font-size:0.76rem;letter-spacing:2px;cursor:pointer;font-family:inherit">${btnText}</button>
+        <button id="_tut-ch-skip" style="background:transparent;border:none;color:rgba(255,255,255,0.2);font-size:0.62rem;cursor:pointer;font-family:inherit;padding:4px">跳过教程</button>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#_tut-ch-btn').onclick = () => { overlay.remove(); resolve(); };
+    overlay.querySelector('#_tut-ch-skip').onclick = () => { overlay.remove(); closeTutorial(); };
+  });
+}
+
+// ── 教程开关 ──────────────────────────────────
+var tutSnapshot = {};  // 教程前快照
+
+function getTutDone() { try { return JSON.parse(localStorage.getItem('StILL_tut_done')||'{}'); } catch(e){return{};} }
+function setTutDone(ch) { const d=getTutDone(); d[ch]=true; localStorage.setItem('StILL_tut_done',JSON.stringify(d)); }
+
+// 选章界面
+function openTutorialSelect() {
+  const done = getTutDone();
+  const chapters = [
+    { key:'task', icon:'💬', title:'任务管理', sub:'创建任务、细化步骤、专注模式' },
+    { key:'cd',   icon:'📅', title:'倒数日',   sub:'添加、拖拽、删除倒数日' },
+    { key:'note', icon:'📝', title:'手账',     sub:'碎碎念、账单记录、悬浮小纸条' },
+  ];
+  const overlay = document.createElement('div');
+  overlay.className = '_tut-select-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:650;background:rgba(4,8,20,0.92);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)';
+  const cards = chapters.map((c,i) => {
+    const isDone = done[c.key];
+    return `<div onclick="document.querySelector('._tut-select-overlay').remove();openTutorial(${i})"
+      style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,${isDone?'0.18':'0.08'});border-radius:12px;padding:16px 20px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:0.15s;min-width:240px"
+      onmouseover="this.style.background='rgba(255,160,80,0.08)';this.style.borderColor='rgba(255,160,80,0.3)'"
+      onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,${isDone?'0.18':'0.08'})'">
+      <div style="font-size:1.8rem;line-height:1;flex-shrink:0">${c.icon}</div>
+      <div style="flex:1;text-align:left">
+        <div style="font-size:0.82rem;color:rgba(255,255,255,0.8);margin-bottom:3px">${c.title}</div>
+        <div style="font-size:0.62rem;color:rgba(255,255,255,0.3)">${c.sub}</div>
+      </div>
+      <div style="font-size:0.6rem;padding:2px 7px;border-radius:5px;flex-shrink:0;${isDone?'background:rgba(100,210,140,0.15);color:rgba(120,220,150,0.8);border:1px solid rgba(100,210,140,0.25)':'background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.08)'}">${isDone?'已完成':'未完成'}</div>
+    </div>`;
+  }).join('');
+  overlay.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:40px;max-width:340px;width:100%">
+      <div style="font-size:0.58rem;letter-spacing:3px;color:rgba(255,255,255,0.25);text-transform:uppercase;margin-bottom:4px">实操教程</div>
+      <div style="font-size:1.1rem;color:rgba(255,255,255,0.75);letter-spacing:1px;margin-bottom:4px">选择功能教程</div>
+      ${cards}
+      <div style="display:flex;gap:12px;margin-top:4px">
+        <button onclick="document.querySelector('._tut-select-overlay').remove();openTutorial(0)"
+          style="background:rgba(255,160,80,0.15);border:1px solid rgba(255,160,80,0.3);color:rgba(255,200,120,0.8);border-radius:9px;padding:7px 20px;font-size:0.7rem;cursor:pointer;font-family:inherit;letter-spacing:1px">全部开始 →</button>
+        <button onclick="document.querySelector('._tut-select-overlay').remove()"
+          style="background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.25);border-radius:9px;padding:7px 16px;font-size:0.7rem;cursor:pointer;font-family:inherit">取消</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function openTutorial(startChapter) {
+  if (tutRunning) return;
+  if (startChapter === undefined) { openTutorialSelect(); return; }
+  tutRunning = true;
+  tutStartChapter = startChapter || 0;
+  tutMsgIds  = [];
+  tutTodoIds = [];
+
+  // 快照：记录开始前状态
+  const topic = appData.topics[appData.activeTopicId];
+  tutRunning_startLen = topic.messages.length;
+  tutSnapshot = {
+    todosSnapshot: JSON.parse(JSON.stringify(appData.todos)),
+    countdownsSnapshot: JSON.parse(JSON.stringify(appData.countdowns || [])),
+    pinnedSnapshot: JSON.parse(JSON.stringify(appData.pinnedCards || [])),
+    notesSnapshot: JSON.parse(JSON.stringify(appData.notes || {})),
+    billsSnapshot: JSON.parse(JSON.stringify(appData.bills || {})),
+    msgLen: topic.messages.length
+  };
+
+  // 隐藏教程前已有的任务（视觉隐藏，数据保留）
+  appData.todos.forEach(t => { t._tutHidden = true; });
+  UI.renderTasks();
+
+  // 显示退出按钮
+  document.getElementById('js-tut-exit-btn').style.display = 'block';
+
+  runTutorial().catch(()=>{});
+}
+
+var tutRunning_startLen = 0;
+var tutStartChapter = 0;
+
+function closeTutorial() {
+  if (!tutRunning) return;
+  tutRunning = false;
+  tutUnlockInputReal();
+  tutUnlockJournalInput();
+  _tutNoteCallback = null;
+  tutHideHint();
+
+  // 隐藏退出按钮
+  document.getElementById('js-tut-exit-btn').style.display = 'none';
+
+  // 删除所有行动按钮、打字指示、章节 overlay
+  document.querySelectorAll('._tut-action-row, ._tut-typing, ._tut-chapter-overlay, ._tut-select-overlay').forEach(e => e.remove());
+  tutHideImmGuide();
+
+  // 恢复教程前快照
+  if (tutSnapshot.todosSnapshot !== undefined) {
+    // 恢复原始任务列表（去除 _tutHidden 标记），丢弃教程期间新增的任务
+    appData.todos = tutSnapshot.todosSnapshot.map(t => { delete t._tutHidden; return t; });
+  }
+  if (tutSnapshot.countdownsSnapshot !== undefined) {
+    appData.countdowns = tutSnapshot.countdownsSnapshot;
+  }
+  if (tutSnapshot.pinnedSnapshot !== undefined) {
+    appData.pinnedCards = tutSnapshot.pinnedSnapshot;
+    restoreFloatCards();
+  }
+
+  // 删除教程期间注入的消息
+  const topic = appData.topics[appData.activeTopicId];
+  topic.messages = topic.messages.slice(0, tutRunning_startLen);
+
+  if (tutSnapshot.notesSnapshot !== undefined) {
+    appData.notes = tutSnapshot.notesSnapshot;
+  }
+  if (tutSnapshot.billsSnapshot !== undefined) {
+    appData.bills = tutSnapshot.billsSnapshot;
+  }
+  tutTodoIds = [];
+  tutSnapshot = {};
+  UI.render();
+  save();
+}
+
+
+// 沉浸模式教程引导浮框（置顶）
+var _tutImmGuideEl = null;
+function tutShowImmGuide(text) {
+  if (!_tutImmGuideEl) {
+    _tutImmGuideEl = document.createElement('div');
+    _tutImmGuideEl.style.cssText = [
+      'position:fixed',
+      'top:72px',
+      'left:50%',
+      'transform:translateX(-50%)',
+      'z-index:1000',
+      'background:rgba(6,12,28,0.95)',
+      'border:1px solid rgba(255,200,100,0.3)',
+      'border-radius:12px',
+      'padding:10px 20px',
+      'font-size:0.72rem',
+      'color:rgba(255,220,140,0.92)',
+      'white-space:nowrap',
+      'pointer-events:none',
+      'box-shadow:0 4px 24px rgba(0,0,0,0.5)',
+      'backdrop-filter:blur(8px)',
+      'transition:opacity 0.2s',
+      'letter-spacing:0.3px',
+    ].join(';');
+    document.body.appendChild(_tutImmGuideEl);
+  }
+  _tutImmGuideEl.textContent = '✦ ' + text;
+  _tutImmGuideEl.style.opacity = '1';
+  _tutImmGuideEl.style.display = 'block';
+}
+function tutHideImmGuide() {
+  if (_tutImmGuideEl) { _tutImmGuideEl.style.opacity = '0'; setTimeout(()=>{ if(_tutImmGuideEl) _tutImmGuideEl.style.display='none'; }, 200); }
+}
+
+// ── 主剧本 ────────────────────────────────────
+
+// ── 手账输入框预填（教程专用）────────────────────
+var _tutNoteCallback = null;
+
+function tutInterceptNote(text) {
+  if (_tutNoteCallback) {
+    const cb = _tutNoteCallback;
+    _tutNoteCallback = null;
+    tutUnlockJournalInput();
+    cb(text);
+  }
+}
+
+function tutLockJournalInput(presetText, onSend) {
+  _tutNoteCallback = onSend;
+  const inp = document.getElementById('js-note-input');
+  inp.value = presetText || '';
+  inp.readOnly = true;
+  inp.style.color = 'rgba(255,200,120,0.85)';
+  inp.style.borderColor = 'rgba(255,160,80,0.35)';
+  tutShowHint('👆 点击手账输入框右侧 ↑ 发送');
+}
+
+function tutUnlockJournalInput() {
+  const inp = document.getElementById('js-note-input');
+  if (!inp) return;
+  inp.readOnly = false;
+  inp.value = '';
+  inp.style.color = '';
+  inp.style.borderColor = '';
+}
+
+async function runTutorial() {
+  const _tutStart = tutStartChapter || 0;
+  await tutDelay(300);
+
+  // ════ 幕一：任务管理 ════
+  if (_tutStart > 0) { /* 跳到下一幕 */ } else {
+  await tutChapterCard('💬', '任务管理', '学习如何用对话创建并管理任务', '开始 →');
+  if (!tutRunning) return;
+
+  await tutAISay('你好！欢迎来到 StILL 👋\n\n试着告诉我你今天想做什么：');
+  if (!tutRunning) return;
+
+  await new Promise(resolve => tutLockInput('我今天要背单词，写论文和画画', resolve));
+  if (!tutRunning) return;
+  await tutDelay(300);
+
+  await tutAISay('好的！帮你整理成三个任务：\n① 背单词\n② 写论文\n③ 画画\n\n要加入任务清单吗？');
+  if (!tutRunning) return;
+
+  await tutShowActionBtns([{label:'加入任务清单 ✓'}]);
+  if (!tutRunning) return;
+
+  // 真实加任务
+  const ids = ['tut-t1','tut-t2','tut-t3'];
+  const names = ['背单词','写论文','画画'];
+  names.forEach((name, i) => {
+    appData.todos.push({ id:ids[i], title:name, progress:0, isCompleted:false, lastMilestone:0, isActive:false, subtasks:[] });
+    tutTodoIds.push(ids[i]);
+  });
+  UI.renderTasks(); save();
+
+  await tutAISay('✓ 已加入清单！\n\n**双击「背单词」** 来细化它，告诉我你的背词范围。', 600);
+  tutShowHint('👆 双击左侧任务「背单词」');
+  if (!tutRunning) return;
+
+  // 等用户双击背单词
+  await new Promise(resolve => {
+    const check = setInterval(() => {
+      const active = appData.todos.find(t => t.id === 'tut-t1' && t.isActive);
+      if (active || !tutRunning) { clearInterval(check); resolve(); }
+    }, 300);
+  });
+  tutHideHint();
+  if (!tutRunning) return;
+
+  await tutAISay('你今天想背哪类词汇，有范围吗？', 500);
+  if (!tutRunning) return;
+
+  await new Promise(resolve => tutLockInput('教育相关词汇，20个', resolve));
+  if (!tutRunning) return;
+  await tutDelay(300);
+
+  await tutAISay('明白！把「背单词」拆成 4 步：', 700);
+  if (!tutRunning) return;
+
+  // 真实加子任务
+  const t1 = appData.todos.find(t => t.id === 'tut-t1');
+  if (t1) {
+    t1.subtasks = [
+      { id:'s1', title:'整理词汇表（5词）', done:false, weight:1 },
+      { id:'s2', title:'记忆第一组（5词）', done:false, weight:1 },
+      { id:'s3', title:'记忆第二组（5词）', done:false, weight:1 },
+      { id:'s4', title:'复习测试（5词）',   done:false, weight:1 },
+    ];
+    UI.renderTasks(); save();
+  }
+  await tutDelay(400);
+
+  await tutAISay('实际使用中，我会陪你一起完成任务、拆解步骤 😊\n\n现在假设你已经完成了背单词：可以直接告诉我「完成了」，或者点左侧任务清单里「背单词」旁的 **✓** 按钮。', 600);
+  tutShowHint('说「完成了」或点击左侧任务清单「背单词」旁的 ✓');
+  if (!tutRunning) return;
+
+  // 只保留「完成了」预设输入；同时轮询真实 ✓ 点击
+  await new Promise(resolve => {
+    let done = false;
+    const finish = () => { if (done) return; done = true; clearInterval(check); tutHideHint(); resolve(); };
+
+    // 轮询真实任务勾选（completeTask 有 380ms 延迟）
+    const check = setInterval(() => {
+      const t = appData.todos.find(t => t.id === 'tut-t1');
+      if (!tutRunning || (t && t.isCompleted)) {
+        // 清空输入框预填内容
+        const inp = document.getElementById('js-msg-input');
+        if (inp) { inp.value = ''; inp.style.color = ''; inp.style.borderColor = ''; inp.readOnly = false; }
+        const sbtn = document.getElementById('js-send-btn');
+        if (sbtn) { sbtn.disabled = true; delete sbtn._tutHandler; }
+        finish();
+      }
+    }, 150);
+
+    // 预设输入「完成了」
+    tutLockInput('完成了', () => {
+      const t = appData.todos.find(t => t.id === 'tut-t1');
+      if (t) { t.isCompleted = true; t.progress = 100; t.isActive = false; }
+      UI.renderTasks(); save();
+      finish();
+    });
+  });
+  if (!tutRunning) return;
+
+  await tutAISay('✓ 背单词完成！\n\n现在**删除「写论文」**——点击任务右侧的 ✕。', 600);
+  tutShowHint('👆 点击「写论文」右侧的 ✕ 删除');
+  if (!tutRunning) return;
+
+  await new Promise(resolve => {
+    const check = setInterval(() => {
+      const exists = appData.todos.find(t => t.id === 'tut-t2');
+      if (!exists || !tutRunning) { clearInterval(check); resolve(); }
+    }, 300);
+  });
+  tutHideHint();
+  if (!tutRunning) return;
+
+  await tutAISay('接下来体验一下专注模式 🎨\n\n鼠标悬浮在「画画」任务上，点击 ⏱ 时钟按钮进入专注。', 600);
+  tutShowHint('👆 悬浮在「画画」任务上，点击 ⏱ 按钮');
+  if (!tutRunning) return;
+
+  // 等待计时器启动（timerState.running 变为 true）
+  await new Promise(resolve => {
+    const check = setInterval(() => {
+      if (timerState && timerState.running || !tutRunning) { clearInterval(check); resolve(); }
+    }, 300);
+  });
+  tutHideHint();
+  if (!tutRunning) return;
+  await tutDelay(500);
+
+  // 沉浸模式：用置顶悬浮框引导（聊天区不可见）
+  await tutDelay(600);
+  tutShowImmGuide('试试右下角的 🌧 雨声按钮，营造安静氛围');
+
+  // 等待雨声开启
+  await new Promise(resolve => {
+    const check = setInterval(() => {
+      const btn = document.getElementById('js-imm-rain');
+      if ((btn && btn.classList.contains('rain-on')) || !tutRunning) { clearInterval(check); resolve(); }
+    }, 300);
+  });
+  if (!tutRunning) { tutHideImmGuide(); return; }
+
+  await tutDelay(400);
+  tutShowImmGuide('雨声已开启 🌧　　点击「✕ 退出专注」继续教学');
+
+  // 等待退出沉浸模式
+  await new Promise(resolve => {
+    const check = setInterval(() => {
+      if ((!timerState || !timerState.running) || !tutRunning) { clearInterval(check); resolve(); }
+    }, 300);
+  });
+  tutHideImmGuide();
+  tutHideHint();
+  if (!tutRunning) return;
+  await tutDelay(400);
+
+  setTutDone('task');
+  } // end if _tutStart<=0
+  const cont1 = _tutStart > 0 ? 'next' : await tutShowActionBtns([{label:'继续：倒数日 →', key:'next'}, {label:'结束教程', key:'exit'}]);
+  if (!tutRunning || cont1 === 'exit') { closeTutorial(); return; }
+
+  // ════ 幕二：倒数日 ════
+  if (_tutStart > 1) { /* 跳到下一幕 */ } else {
+  await tutChapterCard('📅', '倒数日', '为重要日子设置倒数提醒', '继续 →');
+  if (!tutRunning) return;
+
+  await tutAISay('来看看「倒数日」功能 📅\n\n倒数日通过日历来添加，点击左上角 **📅** 打开日历。', 700);
+  tutShowHint('👆 点击左上角 📅 打开日历');
+  if (!tutRunning) return;
+
+  // 等待日历抽屉打开
+  await new Promise(resolve => {
+    const check = setInterval(() => {
+      const drawer = document.getElementById('js-history-drawer');
+      if ((drawer && drawer.classList.contains('open')) || !tutRunning) { clearInterval(check); resolve(); }
+    }, 300);
+  });
+  tutHideHint();
+  if (!tutRunning) return;
+  await tutDelay(400);
+
+  await tutAISay('打开了！\n\n试试给**明天**添加一个体检倒数日：\n双击明天的日期格子，或点击右上角「＋」直接添加。', 600);
+  tutShowHint('👆 双击明天的日期，或点 ＋ 新建倒数日');
+  if (!tutRunning) return;
+
+  // 记录添加前的倒数日数量
+  const cdCountBefore = (appData.countdowns || []).length;
+
+  // 等待新倒数日被添加
+  await new Promise(resolve => {
+    const check = setInterval(() => {
+      const newCount = (appData.countdowns || []).length;
+      if (newCount > cdCountBefore || !tutRunning) { clearInterval(check); resolve(); }
+    }, 400);
+  });
+  tutHideHint();
+  if (!tutRunning) return;
+
+  // 获取刚添加的倒数日 id，用于后续删除
+  var tutCdId = (appData.countdowns || []).slice(-1)[0]?.id;
+  await tutDelay(300);
+
+  await tutAISay('✓ 添加成功！\n\n现在把它**拖拽**到界面上——点击「悬浮」按钮，然后拖动卡片到你喜欢的位置。', 600);
+  tutShowHint('👆 在倒数日管理器里点「悬浮」，然后拖拽卡片');
+  if (!tutRunning) return;
+
+  // 等待 pinnedCards 里出现刚添加的倒数日
+  await new Promise(resolve => {
+    const check = setInterval(() => {
+      const pinned = getPinnedCards().some(p => p.id === tutCdId);
+      if (pinned || !tutRunning) { clearInterval(check); resolve(); }
+    }, 400);
+  });
+  tutHideHint();
+  if (!tutRunning) return;
+  await tutDelay(400);
+
+  await tutAISay('拖拽好了！卡片会记住位置，下次打开还在这里 📌\n\n最后，回到日历页面，点击倒数日项目右侧的 **✕** 删除它。\n\n（关闭悬浮卡片不会删除倒数日本身，要在列表里删除）', 600);
+  tutShowHint('👆 在日历页面倒数日列表里点 ✕ 删除');
+  if (!tutRunning) return;
+
+  // 等待倒数日从 appData.countdowns 中消失
+  await new Promise(resolve => {
+    const check = setInterval(() => {
+      const still = (appData.countdowns || []).some(c => c.id === tutCdId);
+      if (!still || !tutRunning) { clearInterval(check); resolve(); }
+    }, 300);
+  });
+  tutHideHint();
+  if (!tutRunning) return;
+  await tutDelay(300);
+
+  await tutAISay('删除成功 ✓\n\n这就是倒数日的完整使用流程！', 500);
+  if (!tutRunning) return;
+
+  setTutDone('cd');
+  } // end if _tutStart<=1
+  const cont2 = _tutStart > 1 ? 'next' : await tutShowActionBtns([{label:'继续：手账 →', key:'next'}, {label:'结束教程', key:'exit'}]);
+  if (!tutRunning || cont2 === 'exit') { closeTutorial(); return; }
+
+  // ════ 幕三：手账 ════
+  await tutChapterCard('📝', '手账', '随手记录碎碎念和日常收支', '继续 →');
+  if (!tutRunning) return;
+
+  await tutAISay('最后来体验「手账」📝\n\n手账里可以写碎碎念，也能记账单——AI 自动分辨。\n\n点击左上角 **📝** 打开手账。', 700);
+  tutShowHint('👆 点击左上角 📝 打开手账');
+  if (!tutRunning) return;
+
+  // 等待手账抽屉打开
+  await new Promise(resolve => {
+    const check = setInterval(() => {
+      const d = document.getElementById('js-journal-drawer');
+      if ((d && d.classList.contains('open')) || !tutRunning) { clearInterval(check); resolve(); }
+    }, 300);
+  });
+  tutHideHint();
+  if (!tutRunning) return;
+  await tutDelay(400);
+
+  // ── 步骤①：碎碎念 → 小纸条 ──
+  await tutAISay('打开了！\n\n先写一条碎碎念——发送后会记入**小纸条**，不计入账单。', 500);
+  if (!tutRunning) return;
+
+  await new Promise(resolve => {
+    tutLockJournalInput('今天心情不错 🌤', async () => {
+      // 预制：直接写入 note，不调 AI
+      const ds = todayKey();
+      if (!appData.notes[ds]) appData.notes[ds] = [];
+      appData.notes[ds].push({ id:journalNewId(), time:nowTimeStr(), text:'今天心情不错 🌤', isBill:false, mood:4 });
+      save(); renderNoteList(); renderBillList();
+      await tutDelay(300);
+      await tutAISay('✓ 记入小纸条 📎\n\nAI 还会分析情绪，记录到心情晴雨表。', 500);
+      resolve();
+    });
+  });
+  if (!tutRunning) return;
+  await tutDelay(500);
+
+  // ── 步骤②：消费 → 账单 ──
+  await tutAISay('再写一笔消费——发送后会**直接计入账单**，不出现在小纸条里。', 500);
+  if (!tutRunning) return;
+
+  await new Promise(resolve => {
+    tutLockJournalInput('今天午餐吃了沙县，花了18元', async () => {
+      // 预制：直接写入账单，不调 AI
+      const ds = todayKey();
+      if (!appData.notes[ds]) appData.notes[ds] = [];
+      const noteId = journalNewId();
+      appData.notes[ds].push({ id:noteId, time:nowTimeStr(), text:'今天午餐吃了沙县，花了18元', isBill:true, billItem:'沙县午餐', billAmount:-18, mood:null });
+      addBill(ds, '沙县午餐', -18, noteId);
+      save(); renderNoteList(); renderBillList();
+      await tutDelay(300);
+      await tutAISay('✓ 账单已入账：沙县午餐 −¥18 🧾\n\n小纸条区不会出现这条，只有账单区会更新。', 500);
+      resolve();
+    });
+  });
+  if (!tutRunning) return;
+  await tutDelay(500);
+
+  // ── 步骤③：历史查看 ──
+  await tutAISay('所有记录都可以在**历史**里回顾——点击左上角 **📅** 可以查看心情晴雨表、账单统计图表和时间轴。\n\n（现在不需要操作，了解一下就好 😊）', 700);
+  if (!tutRunning) return;
+  await tutDelay(600);
+
+  // ── 步骤④：悬浮小纸条 ──
+  await tutAISay('最后，试试**悬浮小纸条**——点击**小纸条板块右上角「悬浮」按钮**，可以把输入框拖到屏幕任意位置，随手记录不打断当前操作 ✨', 700);
+  tutShowHint('👆 点击小纸条板块右上角「悬浮」按钮');
+  if (!tutRunning) return;
+
+  // 等待悬浮窗出现
+  await new Promise(resolve => {
+    const check = setInterval(() => {
+      const f = document.getElementById('js-note-floater');
+      if ((f && f.classList.contains('visible')) || !tutRunning) { clearInterval(check); resolve(); }
+    }, 300);
+  });
+  tutHideHint();
+  if (!tutRunning) return;
+  await tutDelay(400);
+
+  await tutAISay('悬浮窗打开了！\n\n拖动顶部标题栏，把它移到屏幕角落试试。', 500);
+  tutShowHint('👆 拖动悬浮窗标题栏移动位置');
+  if (!tutRunning) return;
+
+  // 等待用户拖动（floaterPos 发生变化）
+  const startX = floaterPos.x, startY = floaterPos.y;
+  await new Promise(resolve => {
+    const check = setInterval(() => {
+      const moved = Math.abs(floaterPos.x - startX) > 20 || Math.abs(floaterPos.y - startY) > 20;
+      if (moved || !tutRunning) { clearInterval(check); resolve(); }
+    }, 300);
+  });
+  tutHideHint();
+  if (!tutRunning) return;
+  await tutDelay(300);
+
+  await tutAISay('🎉 教程完成！\n\n你已经了解了 StILL 的全部功能。现在开始真正使用吧，有问题随时找我 😊', 700);
+  if (!tutRunning) return;
+
+  setTutDone('note');
+  await tutShowActionBtns([{label:'✓ 开始使用 StILL', key:'done'}]);
+  closeTutorial();
+}
+
 
 </script>
 </body>
