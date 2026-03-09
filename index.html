@@ -623,10 +623,7 @@ body,html{height:100%;overflow:hidden;color:white;font-family:'DM Sans',sans-ser
 .bill-edit-cancel{background:rgba(255,255,255,0.05);border:1px solid var(--glass-b);color:rgba(255,255,255,0.4);border-radius:7px;padding:5px 10px;font-size:0.72rem;cursor:pointer;font-family:inherit}
 
 /* 心情晴雨表 */
-.mood-chart-wrap{flex-shrink:0;padding:12px 16px 8px;border-bottom:1px solid var(--glass-b);position:relative}
 .mood-chart-title{font-size:0.58rem;letter-spacing:2px;opacity:0.3;text-transform:uppercase;margin-bottom:6px}
-#js-mood-canvas{width:100%;height:72px;display:block}
-.mood-axis-labels{position:absolute;right:10px;top:26px;display:flex;flex-direction:column;justify-content:space-between;height:72px;font-size:0.65rem;opacity:0.4;pointer-events:none}
 #js-journal-history-detail{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
 #js-journal-history-detail::-webkit-scrollbar{width:2px}
 #js-journal-history-detail::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
@@ -642,9 +639,10 @@ body,html{height:100%;overflow:hidden;color:white;font-family:'DM Sans',sans-ser
 .hv-section-body{overflow:hidden;transition:max-height 0.28s cubic-bezier(.4,0,.2,1),opacity 0.2s;max-height:300px;opacity:1}
 .hv-section-body.collapsed{max-height:0;opacity:0;pointer-events:none}
 /* mood canvas */
-#js-mood-canvas{width:100%;height:72px;display:block;padding:4px 16px 0;box-sizing:border-box}
-.mood-axis-labels{display:flex;flex-direction:column;justify-content:space-between;height:72px;font-size:0.65rem;opacity:0.38;pointer-events:none;position:absolute;right:12px;top:32px}
-.mood-chart-wrap{position:relative}
+.mood-chart-wrap{position:relative;padding:4px 0 0}
+.mood-canvas-row{display:flex;align-items:stretch;padding:0 16px 6px;gap:4px}
+#js-mood-canvas{flex:1;height:72px;display:block}
+.mood-axis-labels{display:flex;flex-direction:column;justify-content:space-between;height:72px;font-size:0.62rem;opacity:0.4;pointer-events:none;padding:1px 0;line-height:1}
 /* 资产 */
 .asset-row{display:flex;align-items:center;gap:6px;padding:8px 16px 4px}
 .asset-label{font-size:0.62rem;opacity:0.38;white-space:nowrap;flex-shrink:0}
@@ -746,8 +744,10 @@ body,html{height:100%;overflow:hidden;color:white;font-family:'DM Sans',sans-ser
         <span class="hv-section-toggle" id="js-mood-toggle">▾</span>
       </div>
       <div class="hv-section-body" id="js-mood-body">
-        <canvas id="js-mood-canvas" width="280" height="72"></canvas>
-        <div class="mood-axis-labels"><span>☀️</span><span>🌧</span></div>
+        <div class="mood-canvas-row">
+          <canvas id="js-mood-canvas" width="280" height="72"></canvas>
+          <div class="mood-axis-labels"><span>☀️</span><span>🌧</span></div>
+        </div>
       </div>
     </div>
 
@@ -3086,10 +3086,12 @@ async function sendNote(text) {
   note.mood = moodVal;
   if (billData) {
     note.isBill = true;
+    note.billItem = billData.item;
+    note.billAmount = billData.amount;
     addBill(ds, billData.item, billData.amount, note.id);
-  } else {
-    appData.notes[ds].push(note);
   }
+  // 不管是否是账单，note 都存入（账单类不显示在小纸条列表，但数据保留）
+  appData.notes[ds].push(note);
   save();
   renderNoteList();
   renderBillList();
@@ -3105,8 +3107,8 @@ function deleteNote(id) {
 // ── AI 账单识别 ───────────────────────────────
 async function detectBill(text) {
   if (!apiKey || !PROXY_URL) return null;
-  // 正则快速过滤：没有数字就不发请求
-  if (!/[0-9一二三四五六七八九十百]/.test(text)) return null;
+  // 没有任何数字/金额关键词就不发请求
+  if (!/[0-9零一二三四五六七八九十百千万元块角分￥¥]/.test(text)) return null;
 
   try {
     const res = await fetch(PROXY_URL, {
@@ -3114,16 +3116,31 @@ async function detectBill(text) {
       body: JSON.stringify({
         apiKey, model: currentPlatform?.model||'deepseek-chat',
         messages:[
-          {role:'system', content:'判断这句话是否是一条消费/购物记录。如果是，提取商品/服务名称和金额，用JSON回复：{"isBill":true,"item":"名称","amount":数字}；如果不是消费记录，回复：{"isBill":false}。只输出JSON，不要其他内容。'},
+          {role:'system', content:`你是记账助手。判断这句话是否包含消费或收入信息，并提取金额。
+规则：
+- 餐饮/购物/交通/娱乐/服务等日常花费 → 支出，amount为负数
+- 明确获得金钱（收入/工资/奖金/红包/给我/转账/赚到/入账）→ 收入，amount为正数
+- 有金额但无法判断方向 → 默认支出，amount为负数
+- 完全没有收支内容 → isBill:false
+
+示例：
+"吃了16元的肯德基" → {"isBill":true,"item":"肯德基早餐","amount":-16}
+"午餐18元" → {"isBill":true,"item":"午餐","amount":-18}
+"打车花了23块" → {"isBill":true,"item":"打车","amount":-23}
+"妈妈给我200元" → {"isBill":true,"item":"妈妈转账","amount":200}
+"工资收入3500" → {"isBill":true,"item":"工资","amount":3500}
+"今天天气真好" → {"isBill":false}
+
+只输出JSON，不要其他内容。`},
           {role:'user', content:text}
         ],
-        temperature:0.1, max_tokens:60
+        temperature:0, max_tokens:80
       })
     });
     const data = await res.json();
     const raw = data.choices?.[0]?.message?.content||'{}';
     const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
-    if (parsed.isBill && parsed.amount > 0) return { item: parsed.item||text, amount: Number(parsed.amount) };
+    if (parsed.isBill && parsed.amount !== 0) return { item: parsed.item||text, amount: Number(parsed.amount) };
   } catch(e) {}
   return null;
 }
