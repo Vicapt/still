@@ -446,6 +446,8 @@ body,html{height:100%;overflow:hidden;color:white;font-family:'DM Sans',sans-ser
 }
 .cd-all-list::-webkit-scrollbar{width:2px}
 .cd-all-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:4px}
+.changelog-body{scrollbar-width:none}
+.changelog-body::-webkit-scrollbar{display:none}
 /* 倒数日列表行 */
 .cd-item{
   display:flex;align-items:center;gap:8px;
@@ -825,7 +827,7 @@ body,html{height:100%;overflow:hidden;color:white;font-family:'DM Sans',sans-ser
     <div class="journal-title" style="letter-spacing:4px;font-size:0.85rem">StILL</div>
     <button class="btn-close-drawer" onclick="closeChangelog()">关闭</button>
   </div>
-  <div style="flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:18px" id="js-changelog-body"></div>
+  <div style="flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:18px" id="js-changelog-body" class="changelog-body"></div>
   <div style="padding:14px 20px;border-top:1px solid var(--glass-b);flex-shrink:0">
     <button class="guide-entry-btn" onclick="openGuide()">✦ 新人指引</button>
   </div>
@@ -4320,5 +4322,14 @@ async function runTutorial() {
 
 
 </script>
+  <!-- 底部联系栏 -->
+  <div style="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:0;pointer-events:none;font-size:0.58rem;color:rgba(255,255,255,0.2);letter-spacing:0.5px;white-space:nowrap">
+    <span>@Vicapt</span>
+    <span style="margin:0 5px;opacity:0.5">/</span>
+    <a href="mailto:huangweidivicky@hotmail.com" style="pointer-events:auto;color:rgba(255,255,255,0.2);text-decoration:none;transition:color 0.15s"
+      onmouseover="this.style.color='rgba(255,255,255,0.5)'"
+      onmouseout="this.style.color='rgba(255,255,255,0.2)'">联系反馈</a>
+  </div>
+
 </body>
 </html>
