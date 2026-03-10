@@ -2817,7 +2817,7 @@ function renderMoodChart(ym, highlightDs) {
       const dayNotes = (appData.notes[ds]||[]).filter(n=>!n.isBill && n.mood!==undefined);
       if (!dayNotes.length) continue;
       const avg = dayNotes.reduce((s,n)=>s+n.mood,0)/dayNotes.length;
-      points.push({ ds, x:(d-1)/(daysInMonth-1||1), y:avg });
+      points.push({ ds, d, x:(d-1)/30, y:avg });  // 固定31格(0~30)
     }
   } else {
     const today = new Date(); today.setHours(0,0,0,0);
@@ -2953,16 +2953,19 @@ function renderBillChart(ym, highlightDs) {
   const pad = {l:8,r:8,t:6,b:14};
   const cw = W-pad.l-pad.r, ch = H-pad.t-pad.b;
   const maxAbs = Math.max(...days.map(d=>Math.max(Math.abs(d.income),Math.abs(d.expense),0.01)));
-  const barW = Math.max(3, Math.floor(cw/days.length)-2);
+  // 固定 31 格横轴，与心情图完全对齐；空白格允许留空
+  const totalDays = 31;
+  const slotW = cw / totalDays;
+  const barW = Math.max(3, Math.floor(slotW * 0.6));
   const zero = pad.t + ch/2;
 
   // 零线
   ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(pad.l,zero); ctx.lineTo(pad.l+cw,zero); ctx.stroke();
 
-  // 存储柱位置供 tooltip
-  canvas._billDays = days.map((item,i) => {
-    const x = pad.l + i*(cw/days.length) + (cw/days.length-barW)/2;
+  // 存储柱位置供 tooltip（按日期在月中位置定位，与心情图 x 轴对齐）
+  canvas._billDays = days.map((item) => {
+    const x = pad.l + (item.d - 1) / 30 * cw + (slotW - barW) / 2;
     const isHL = item.ds === highlightDs;
 
     // 收入柱（绿，向上）
@@ -3405,7 +3408,6 @@ document.getElementById('js-note-input').addEventListener('input', function(){
   this.style.height='34px';
   this.style.height=Math.min(this.scrollHeight, 80)+'px';
 });
-checkChangelogDot();
 document.getElementById('js-floater-input').addEventListener('keydown', function(e){
   if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendFloaterNote(); }
 });
@@ -3507,6 +3509,7 @@ function checkChangelogDot() {
     document.getElementById('js-changelog-dot').classList.add('show');
   }
 }
+checkChangelogDot();
 
 
 // ══════════════════════════════════════════════
@@ -4046,11 +4049,11 @@ async function runTutorial() {
   }
   await tutDelay(400);
 
-  await tutAISay('实际使用中，我会陪你一起完成任务、拆解步骤 😊\n\n现在假设你已经完成了背单词：可以直接告诉我「完成了」，或者点左侧任务清单里「背单词」旁的 **✓** 按钮。', 600);
-  tutShowHint('说「完成了」或点击左侧任务清单「背单词」旁的 ✓');
+  await tutAISay('实际使用中，我会陪你一起完成任务、拆解步骤 😊\n\n现在告诉我「背单词任务完成」，或者点左侧任务清单里「背单词」旁的 **✓** 按钮。', 600);
+  tutShowHint('说「背单词任务完成」或点击左侧「背单词」旁的 ✓');
   if (!tutRunning) return;
 
-  // 只保留「完成了」预设输入；同时轮询真实 ✓ 点击
+  // 预设输入「背单词任务完成」；同时轮询真实 ✓ 点击
   await new Promise(resolve => {
     let done = false;
     const finish = () => { if (done) return; done = true; clearInterval(check); tutHideHint(); resolve(); };
@@ -4059,7 +4062,6 @@ async function runTutorial() {
     const check = setInterval(() => {
       const t = appData.todos.find(t => t.id === 'tut-t1');
       if (!tutRunning || (t && t.isCompleted)) {
-        // 清空输入框预填内容
         const inp = document.getElementById('js-msg-input');
         if (inp) { inp.value = ''; inp.style.color = ''; inp.style.borderColor = ''; inp.readOnly = false; }
         const sbtn = document.getElementById('js-send-btn');
@@ -4068,8 +4070,8 @@ async function runTutorial() {
       }
     }, 150);
 
-    // 预设输入「完成了」
-    tutLockInput('完成了', () => {
+    // 预设输入「背单词任务完成」
+    tutLockInput('背单词任务完成', () => {
       const t = appData.todos.find(t => t.id === 'tut-t1');
       if (t) { t.isCompleted = true; t.progress = 100; t.isActive = false; }
       UI.renderTasks(); save();
@@ -4326,9 +4328,7 @@ async function runTutorial() {
   <div style="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:0;pointer-events:none;font-size:0.58rem;color:rgba(255,255,255,0.2);letter-spacing:0.5px;white-space:nowrap">
     <span>@Vicapt</span>
     <span style="margin:0 5px;opacity:0.5">/</span>
-    <a href="mailto:huangweidivicky@hotmail.com" style="pointer-events:auto;color:rgba(255,255,255,0.2);text-decoration:none;transition:color 0.15s"
-      onmouseover="this.style.color='rgba(255,255,255,0.5)'"
-      onmouseout="this.style.color='rgba(255,255,255,0.2)'">联系反馈</a>
+    <a href="/cdn-cgi/l/email-protection#f59d80949b9282909c919c839c969e8cb59d9a8198949c99db969a98" style="pointer-events:auto;color:rgba(255,255,255,0.2);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.2)'">联系反馈</a>
   </div>
 
 </body>
