@@ -195,7 +195,7 @@
   --cd-item-bg:rgba(255,255,255,0.55);--cd-item-b:rgba(80,120,150,0.15);
   --cd-item-hover:rgba(255,255,255,0.75);
   --cd-pin-color:rgba(40,80,110,0.45);
-  --cd-form-bg:rgba(255,255,255,0.55);
+  --cd-form-bg:rgba(238,248,254,0.99);
   --cd-input-bg:rgba(255,255,255,0.75);
   --cd-placeholder:rgba(60,100,130,0.4);
   --guide-bg:rgba(240,248,254,0.99);
@@ -280,8 +280,11 @@ body,html{height:100%;overflow:hidden;color:var(--txt);font-family:'DM Sans',san
 
 /* TOP-CENTER: clock + focus stats */
 .top-center{position:absolute;top:0;left:0;right:0;display:flex;flex-direction:column;align-items:center;padding-top:16px;z-index:20;pointer-events:none}
+.top-clock-row{position:relative;display:flex;align-items:center;justify-content:center;pointer-events:auto}
+.imm-quick-btn{position:absolute;right:-36px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--txt);opacity:0.45;font-size:0.85rem;cursor:pointer;padding:3px 5px;line-height:1;transition:opacity 0.2s;pointer-events:auto}
+.imm-quick-btn:hover{opacity:0.85}
 .live-date{font-size:0.65rem;opacity:0.3;letter-spacing:2.5px;margin-bottom:4px}
-.live-clock{font-family:'DM Serif Display',serif;font-size:2.2rem;letter-spacing:4px;opacity:0.75;line-height:1}
+.live-clock{font-family:'DM Serif Display',serif;font-size:2.2rem;letter-spacing:4px;opacity:0.75;line-height:1;font-variant-numeric:tabular-nums;font-feature-settings:'tnum'}
 .focus-stat{font-size:0.68rem;opacity:0.35;letter-spacing:2px;margin-top:4px}
 
 /* LAYOUT */
@@ -359,7 +362,7 @@ body,html{height:100%;overflow:hidden;color:var(--txt);font-family:'DM Sans',san
 .task-inner{position:relative;z-index:1;display:flex;align-items:center;gap:6px}
 .task-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .task-pct{font-size:0.68rem;color:var(--task-pct);flex-shrink:0;font-weight:500}
-.task-actions{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:none;gap:3px;z-index:2;align-items:center}
+.task-actions{position:absolute;right:6px;top:10px;display:none;gap:3px;z-index:2;align-items:center}
 .task-item:hover .task-actions{display:flex}
 .task-btn{background:var(--task-btn-bg);border:1px solid var(--task-btn-b);color:var(--task-btn-color);border-radius:6px;padding:2px 6px;font-size:0.65rem;cursor:pointer;font-family:inherit;transition:0.15s;white-space:nowrap}
 .task-btn.timer-btn:hover{background:rgba(255,160,80,0.25);border-color:rgba(255,160,80,0.4);color:rgba(255,210,130,0.95)}
@@ -389,7 +392,9 @@ body,html{height:100%;overflow:hidden;color:var(--txt);font-family:'DM Sans',san
 .timer-card{background:var(--panel-bg-mid);border:1px solid var(--glass-b);border-radius:28px;padding:40px 36px;width:360px;display:flex;flex-direction:column;gap:20px;align-items:center;box-shadow:0 30px 90px rgba(0,0,0,0.7)}
 .timer-card h3{font-family:'DM Serif Display',serif;font-size:1.4rem;letter-spacing:3px;color:var(--timer-txt);opacity:0.85}
 .timer-card p{font-size:0.78rem;color:var(--timer-sub);opacity:1;text-align:center}
-.timer-task-label{font-size:0.8rem;opacity:0.55;background:var(--glass);border:1px solid var(--glass-b);border-radius:10px;padding:8px 16px;text-align:center;width:100%}
+.timer-task-label{font-size:0.8rem;opacity:0.55;background:var(--glass);border:1px solid var(--glass-b);border-radius:10px;padding:8px 16px;text-align:center;width:100%;box-sizing:border-box}
+.timer-task-input{outline:none;font-family:inherit;color:var(--txt);cursor:text;opacity:0.75}
+.timer-task-input:focus{border-color:var(--amber-b);opacity:1}
 .duration-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .dur-btn{background:var(--glass);border:1px solid var(--glass-b);color:var(--dur-color);border-radius:12px;padding:10px 18px;font-size:0.88rem;cursor:pointer;font-family:inherit;transition:0.2s}
 .dur-btn:hover,.dur-btn.active{background:var(--amber);border-color:var(--amber-b);color:var(--amber-btn-color)}
@@ -583,6 +588,88 @@ body,html{height:100%;overflow:hidden;color:var(--txt);font-family:'DM Sans',san
   background:rgba(100,160,255,0.16);border-color:rgba(100,160,255,0.28);
   color:rgba(100,160,255,0.88);
 }
+
+/* ── 音量滑轨 ── */
+.vol-anchor{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+/* 透明的热区桥接，防止鼠标离开按钮时弹窗消失 */
+.vol-bridge{
+  position:absolute;
+  bottom:100%;left:50%;
+  transform:translateX(-50%);
+  width:44px;height:16px;
+  pointer-events:none;
+}
+.vol-popup{
+  position:absolute;
+  bottom:calc(100% + 10px);
+  left:50%;
+  transform:translateX(-50%) translateY(6px);
+  width:36px;
+  padding:10px 0 10px;
+  background:var(--panel-bg-deep);
+  border:1px solid var(--glass-b);
+  border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  box-shadow:0 4px 20px rgba(0,0,0,0.12);
+  z-index:300;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.16s ease,transform 0.16s ease;
+}
+.vol-popup.show{
+  opacity:1;pointer-events:auto;
+  transform:translateX(-50%) translateY(0);
+}
+.vol-pct{
+  font-size:0.58rem;
+  color:var(--txt-dim);
+  letter-spacing:0.2px;
+  line-height:1;
+  user-select:none;
+  font-variant-numeric:tabular-nums;
+}
+/* 自定义纵向滑轨 track */
+.vol-track{
+  position:relative;
+  width:4px;height:72px;
+  background:var(--glass-b);
+  border-radius:4px;
+  cursor:pointer;
+  flex-shrink:0;
+}
+.vol-fill{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  border-radius:4px;
+  background:var(--amber-accent);
+  transition:height 0.06s;
+  pointer-events:none;
+}
+.vol-anchor.vol-rain .vol-fill{
+  background:rgba(130,185,255,0.9);
+}
+.vol-thumb{
+  position:absolute;
+  left:50%;
+  width:12px;height:12px;
+  border-radius:50%;
+  background:var(--amber-accent);
+  transform:translate(-50%,50%);
+  box-shadow:0 1px 4px rgba(0,0,0,0.12);
+  pointer-events:none;
+  transition:transform 0.1s;
+}
+.vol-anchor.vol-rain .vol-thumb{
+  background:rgba(130,185,255,0.95);
+  box-shadow:0 1px 5px rgba(80,140,255,0.3);
+}
+.vol-track:hover .vol-thumb{
+  transform:translate(-50%,50%) scale(1.25);
+}
 /* Track dropdown */
 .track-dropdown{
   position:absolute;bottom:calc(100% + 6px);right:0;
@@ -591,7 +678,7 @@ body,html{height:100%;overflow:hidden;color:var(--txt);font-family:'DM Sans',san
   overflow-y:auto;overscroll-behavior:contain;
   display:flex;flex-direction:column;gap:2px;
   backdrop-filter:blur(24px);z-index:200;
-  box-shadow:0 8px 28px rgba(0,0,0,0.4);
+  box-shadow:0 4px 20px rgba(0,0,0,0.12);
   animation:ddIn 0.15s cubic-bezier(.4,0,.2,1);
 }
 @keyframes ddIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
@@ -734,6 +821,8 @@ body,html{height:100%;overflow:hidden;color:var(--txt);font-family:'DM Sans',san
 .cd-info{flex:1;min-width:0}
 .cd-name{font-size:0.73rem;opacity:0.82;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cd-days{font-size:0.63rem;opacity:0.38;margin-top:1px}
+.cd-name-row{display:flex;align-items:baseline;gap:5px;overflow:hidden}
+.cd-date{font-size:0.58rem;opacity:0.3;letter-spacing:0.3px;flex-shrink:0;white-space:nowrap}
 .cd-days.today{color:var(--cd-today-color);opacity:1}
 .cd-days.past{opacity:0.22;text-decoration:line-through}
 .cd-pin-btn{
@@ -990,7 +1079,7 @@ body,html{height:100%;overflow:hidden;color:var(--txt);font-family:'DM Sans',san
 <body>
 
 <!-- 新建倒数日表单（全局，隐藏时不占位）-->
-<div class="cd-form hidden" id="js-cd-form" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:260px;z-index:500;background:rgba(8,14,28,0.97);border:1px solid var(--glass-b);border-radius:16px;padding:16px;box-shadow:0 16px 48px rgba(0,0,0,0.6)">
+<div class="cd-form hidden" id="js-cd-form" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:260px;z-index:500;border:1px solid var(--glass-b);border-radius:16px;padding:16px;box-shadow:0 16px 48px rgba(0,0,0,0.5)">
   <div style="font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;opacity:0.35;margin-bottom:10px">新建倒数日</div>
   <input type="text" id="js-cd-name" placeholder="事件名称…" maxlength="20">
   <input type="date" id="js-cd-date" style="margin-top:5px">
@@ -1182,7 +1271,8 @@ body,html{height:100%;overflow:hidden;color:var(--txt);font-family:'DM Sans',san
 <div class="timer-picker hidden" id="js-timer-picker">
   <div class="timer-card">
     <h3>专注计时</h3>
-    <div class="timer-task-label" id="js-picker-task-name">全局专注</div>
+    <div class="timer-task-label" id="js-picker-task-name" style="display:none">全局专注</div>
+    <input class="timer-task-label timer-task-input" id="js-picker-task-input" type="text" placeholder="专注任务名称…" maxlength="30" autocomplete="off" style="display:none">
     <p>选择专注时长</p>
     <div class="duration-btns">
       <button class="dur-btn" data-min="15">15 分钟</button>
@@ -1300,7 +1390,10 @@ body,html{height:100%;overflow:hidden;color:var(--txt);font-family:'DM Sans',san
   <!-- Top-center -->
   <div class="top-center">
     <div class="live-date" id="js-live-date"></div>
-    <div class="live-clock" id="js-live-clock">00:00:00</div>
+    <div class="top-clock-row">
+      <div class="live-clock" id="js-live-clock">00:00:00</div>
+      <button class="imm-quick-btn" id="js-imm-quick" title="进入沉浸模式">⏱</button>
+    </div>
     <div class="focus-stat" id="js-focus-stat">今日已专注 · 0 分钟</div>
   </div>
 
@@ -1352,9 +1445,29 @@ body,html{height:100%;overflow:hidden;color:var(--txt);font-family:'DM Sans',san
         <div class="track-name-wrap"><div class="track-name" id="js-track-name">— 选择曲目 —</div></div>
         <div class="player-controls">
           <button class="ctrl-btn" id="js-prev-track" title="上一首">&lt;</button>
-          <button class="ctrl-btn ctrl-play" id="js-play-btn" title="播放">&#9654;</button>
+          <!-- 音乐音量 -->
+          <div class="vol-anchor" id="js-music-vol-anchor">
+            <button class="ctrl-btn ctrl-play" id="js-play-btn" title="播放">&#9654;</button>
+            <div class="vol-popup" id="js-music-vol-popup">
+              <span class="vol-pct" id="js-music-vol-pct">55%</span>
+              <div class="vol-track" id="js-music-vol-track">
+                <div class="vol-fill" id="js-music-vol-fill" style="height:55%"></div>
+                <div class="vol-thumb" id="js-music-vol-thumb" style="bottom:55%"></div>
+              </div>
+            </div>
+          </div>
           <button class="ctrl-btn" id="js-next-track" title="下一首">&gt;</button>
-          <button class="ctrl-btn ctrl-rain" id="js-audio-btn" title="雨声">🌧</button>
+          <!-- 雨声音量 -->
+          <div class="vol-anchor vol-rain" id="js-rain-vol-anchor">
+            <button class="ctrl-btn ctrl-rain" id="js-audio-btn" title="雨声">🌧</button>
+            <div class="vol-popup" id="js-rain-vol-popup">
+              <span class="vol-pct" id="js-rain-vol-pct">50%</span>
+              <div class="vol-track" id="js-rain-vol-track">
+                <div class="vol-fill" id="js-rain-vol-fill" style="height:50%"></div>
+                <div class="vol-thumb" id="js-rain-vol-thumb" style="bottom:50%"></div>
+              </div>
+            </div>
+          </div>
           <div style="position:relative">
             <button class="ctrl-btn ctrl-list" id="js-track-list-btn" title="选曲">&#9776;</button>
             <div class="track-dropdown hidden" id="js-track-dropdown"></div>
@@ -1536,6 +1649,7 @@ document.getElementById('js-save-key').onclick = () => {
 };
 document.getElementById('js-open-help').onclick = ()=>showModal('help');
 document.getElementById('js-back-btn').onclick = ()=>showModal('key');
+document.getElementById('js-imm-quick').onclick = openTimerPickerQuick;
 document.getElementById('js-btn-key-settings').onclick = ()=>showModal('key');
 document.getElementById('js-api-status').style.cursor='pointer';
 document.getElementById('js-api-status').onclick = ()=>{ if(!apiKey) showModal('key'); };
@@ -1563,7 +1677,7 @@ const audio = new Audio();
 audio.loop = true; audio.volume = 0; let audioPlaying = false;
 // 兼容两种文件名
 (function(){
-  const names = ['raindrop.mp3','raindrops.mp3'];
+  const names = ['soundeffect/raindrop.mp3'];
   let idx = 0;
   function tryNext() {
     if (idx >= names.length) return;
@@ -1586,7 +1700,7 @@ function toggleAudio(btn) {
     audio.play().catch(()=>{});
     audioPlaying=true;
     btn.classList.add('rain-on');
-    fadeAudio(0.5);
+    fadeAudio(getRainTargetVol());
   } else {
     fadeAudio(0,()=>{audio.pause();audioPlaying=false;});
     btn.classList.remove('rain-on');
@@ -1660,12 +1774,12 @@ function stayToColor(stayMin) {
   const isDay = document.documentElement.getAttribute('data-theme') === 'day';
   if (!stayMin || stayMin === 0) return 'var(--cal-day-bg)';
   if (isDay) {
-    // 白天：绿色系，从浅到深
-    if (stayMin < 5)  return 'rgba(100,180,120,0.30)';
-    if (stayMin < 15) return 'rgba(70,160,100,0.52)';
-    if (stayMin < 30) return 'rgba(50,145,85,0.72)';
-    if (stayMin < 60) return 'rgba(35,130,70,0.88)';
-    return 'rgba(20,115,58,0.97)';
+    // 白天：抹茶绿带蓝调
+    if (stayMin < 5)  return 'rgba(140,195,150,0.28)';
+    if (stayMin < 15) return 'rgba(110,180,140,0.44)';
+    if (stayMin < 30) return 'rgba(85,165,125,0.58)';
+    if (stayMin < 60) return 'rgba(65,150,115,0.72)';
+    return 'rgba(45,135,105,0.84)';
   } else {
     // 夜间：琥珀橙色系
     if (stayMin < 5)  return 'rgba(255,160,80,0.18)';
@@ -1748,7 +1862,7 @@ function renderCalendar() {
 function updateCalLegend() {
   const isDay = document.documentElement.getAttribute('data-theme') === 'day';
   const colors = isDay
-    ? ['rgba(100,180,120,0.30)','rgba(70,160,100,0.52)','rgba(35,130,70,0.88)','rgba(20,115,58,0.97)']
+    ? ['rgba(140,195,150,0.28)','rgba(110,180,140,0.44)','rgba(65,150,115,0.72)','rgba(45,135,105,0.84)']
     : ['rgba(255,160,80,0.18)','rgba(255,160,80,0.45)','rgba(255,160,80,0.78)','rgba(255,200,120,0.95)'];
   ['lb1','lb2','lb3','lb4'].forEach((id,i)=>{
     const el=document.getElementById(id);
@@ -1793,14 +1907,31 @@ function updateFlipClock(sec) {
   });
 }
 
+var _pickerQuickMode = false;
 function openTimerPicker(taskId) {
-  pickerTargetTaskId=taskId;
-  const taskName=taskId ? appData.todos.find(t=>t.id===taskId)?.title||'全局专注' : '全局专注';
-  document.getElementById('js-picker-task-name').textContent=taskName;
+  _pickerQuickMode = false;
+  pickerTargetTaskId = taskId;
+  const taskName = taskId ? appData.todos.find(t=>t.id===taskId)?.title||'全局专注' : '全局专注';
+  document.getElementById('js-picker-task-name').textContent = taskName;
+  document.getElementById('js-picker-task-name').style.display = '';
+  document.getElementById('js-picker-task-input').style.display = 'none';
   document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('active'));
   document.querySelector('.dur-btn[data-min="25"]').classList.add('active');
   document.getElementById('js-custom-min').value='';
   document.getElementById('js-timer-picker').classList.remove('hidden');
+}
+function openTimerPickerQuick() {
+  _pickerQuickMode = true;
+  pickerTargetTaskId = null;
+  document.getElementById('js-picker-task-name').style.display = 'none';
+  const inp = document.getElementById('js-picker-task-input');
+  inp.style.display = '';
+  inp.value = '';
+  document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.dur-btn[data-min="25"]').classList.add('active');
+  document.getElementById('js-custom-min').value='';
+  document.getElementById('js-timer-picker').classList.remove('hidden');
+  setTimeout(() => inp.focus(), 80);
 }
 
 document.querySelectorAll('.dur-btn').forEach(btn=>{
@@ -1841,10 +1972,15 @@ document.getElementById('js-start-timer').onclick=()=>{
     minutes=active?parseInt(active.dataset.min):25;
   }
   document.getElementById('js-timer-picker').classList.add('hidden');
-  startImmersive(minutes*60, pickerTargetTaskId);
+  let _quickLabel = null;
+  if (_pickerQuickMode) {
+    const v = document.getElementById('js-picker-task-input').value.trim();
+    _quickLabel = v || '自由专注';
+  }
+  startImmersive(minutes*60, pickerTargetTaskId, _quickLabel);
 };
 
-function startImmersive(totalSec, taskId) {
+function startImmersive(totalSec, taskId, customLabel) {
   timerState.running=true;
   timerState.totalSec=totalSec;
   timerState.remainSec=totalSec;
@@ -1865,7 +2001,7 @@ function startImmersive(totalSec, taskId) {
   buildRainMemo(140, 0.22, 0.35);
   hideFloatCards();
 
-  const taskLabel=taskId ? appData.todos.find(t=>t.id===taskId)?.title||'专注中' : '专注中';
+  const taskLabel = customLabel || (taskId ? appData.todos.find(t=>t.id===taskId)?.title||'专注中' : '专注中');
   document.getElementById('js-imm-task-label').textContent=taskLabel;
 
   // Sync immersive chat display with current topic
@@ -2249,7 +2385,7 @@ const UI={
         <div class="progress-fill" style="width:${t.progress}%"></div>
         <div class="task-inner"><span class="task-name">${t.title}</span>${(t.progress>0||subs.length>0&&t.isActive)?`<span class="task-pct">${t.progress}%</span>`:''}</div>
         <div class="task-actions">
-          <button class="task-btn timer-btn" onclick="event.stopPropagation();openTimerPicker('${t.id}')" title="番茄钟">⏱</button>
+          <button class="task-btn timer-btn" onclick="event.stopPropagation();openTimerPicker('${t.id}')" >⏱</button>
           ${!t.isCompleted?`<button class="task-btn done-btn" onclick="event.stopPropagation();UI.completeTask('${t.id}')">✓</button>`:''}
           <button class="task-btn del-btn" onclick="event.stopPropagation();UI.deleteTask('${t.id}')">✕</button>
         </div>
@@ -2556,8 +2692,8 @@ window.openTimerPicker=openTimerPicker;
 // MUSIC PLAYER
 // ══════════════════════════════════════════════
 const TRACKS = [
-  { name: '曲目一',   src: 'music/track1.mp3' },
-  { name: '曲目二',   src: 'music/track2.mp3' },
+  { name: 'Love Switch - Justnormal',   src: 'music/Love Switch - Justnormal.mp3' },
+  { name: 'Cozy at 3am - Justnormal',   src: 'music/Cozy at 3am - Justnormal.mp3' },
   { name: '曲目三',   src: 'music/track3.mp3' },
   { name: '曲目四',   src: 'music/track4.mp3' },
   { name: '曲目五',   src: 'music/track5.mp3' },
@@ -2635,12 +2771,18 @@ document.addEventListener('click', () => {
   document.getElementById('js-track-dropdown').classList.add('hidden');
 });
 
+function getMusicTargetVol() {
+  return window._getMusicTargetVol ? window._getMusicTargetVol() : 0.55;
+}
+function getRainTargetVol() {
+  return window._getRainTargetVol ? window._getRainTargetVol() : 0.5;
+}
 function playMusic() {
   musicAudio.play().catch(() => {});
   musicPlaying = true;
   document.getElementById('js-play-btn').innerHTML = '<b style="letter-spacing:1px">II</b>';
   document.getElementById('js-play-btn').classList.add('active');
-  fadeMusicTo(0.55);
+  fadeMusicTo(getMusicTargetVol());
 }
 
 function pauseMusic() {
@@ -2683,6 +2825,89 @@ document.getElementById('js-next-track').onclick = () => {
 
 // Init: preload first track name without playing
 loadTrack(0);
+
+// ── 音量滑轨控制（自定义拖拽，hover 桥接防抖） ──
+(function(){
+  function makeVolCtrl(opts){
+    // opts: { trackEl, fillEl, thumbEl, pctEl, initVal, onChange }
+    const track = opts.trackEl, fill = opts.fillEl, thumb = opts.thumbEl, pct = opts.pctEl;
+    let val = opts.initVal; // 0–100
+    let dragging = false;
+
+    function setVal(v, emit){
+      val = Math.max(0, Math.min(100, Math.round(v)));
+      const pctH = val + '%';
+      fill.style.height = pctH;
+      thumb.style.bottom = pctH;
+      pct.textContent = val + '%';
+      if(emit && opts.onChange) opts.onChange(val / 100);
+    }
+    setVal(val, false);
+
+    function posToVal(e){
+      const rect = track.getBoundingClientRect();
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const ratio = 1 - (clientY - rect.top) / rect.height;
+      return ratio * 100;
+    }
+
+    track.addEventListener('mousedown', function(e){
+      e.preventDefault(); dragging = true;
+      setVal(posToVal(e), true);
+    });
+    document.addEventListener('mousemove', function(e){
+      if(!dragging) return;
+      setVal(posToVal(e), true);
+    });
+    document.addEventListener('mouseup', function(){ dragging = false; });
+
+    return { getVal: () => val / 100 };
+  }
+
+  // ── 弹窗 hover 逻辑（含桥接防抖） ──
+  function makeHoverPopup(anchorEl, popupEl){
+    let hideTimer = null;
+    function show(){ clearTimeout(hideTimer); popupEl.classList.add('show'); }
+    function scheduleHide(){ hideTimer = setTimeout(()=>{ popupEl.classList.remove('show'); }, 120); }
+
+    anchorEl.addEventListener('mouseenter', show);
+    anchorEl.addEventListener('mouseleave', scheduleHide);
+    popupEl.addEventListener('mouseenter', show);
+    popupEl.addEventListener('mouseleave', scheduleHide);
+  }
+
+  // 音乐
+  const musicCtrl = makeVolCtrl({
+    trackEl: document.getElementById('js-music-vol-track'),
+    fillEl:  document.getElementById('js-music-vol-fill'),
+    thumbEl: document.getElementById('js-music-vol-thumb'),
+    pctEl:   document.getElementById('js-music-vol-pct'),
+    initVal: 55,
+    onChange: v => { if(musicPlaying) musicAudio.volume = v * 0.7; }
+  });
+  makeHoverPopup(
+    document.getElementById('js-music-vol-anchor'),
+    document.getElementById('js-music-vol-popup')
+  );
+
+  // 雨声
+  const rainCtrl = makeVolCtrl({
+    trackEl: document.getElementById('js-rain-vol-track'),
+    fillEl:  document.getElementById('js-rain-vol-fill'),
+    thumbEl: document.getElementById('js-rain-vol-thumb'),
+    pctEl:   document.getElementById('js-rain-vol-pct'),
+    initVal: 50,
+    onChange: v => { if(audioPlaying) audio.volume = v; }
+  });
+  makeHoverPopup(
+    document.getElementById('js-rain-vol-anchor'),
+    document.getElementById('js-rain-vol-popup')
+  );
+
+  // 暴露给 playMusic / toggleAudio
+  window._getMusicTargetVol = () => musicCtrl.getVal() * 0.7;
+  window._getRainTargetVol  = () => rainCtrl.getVal();
+})();
 
 // INIT
 UI.render();
@@ -2845,6 +3070,14 @@ function makeDaysLabel(days) {
   return {num: String(-days), unit:'天前', cls:''};
 }
 
+function cdDateStr(c) {
+  const d = cdNextDate(c);
+  const y = d.getFullYear(), m = d.getMonth()+1, day = d.getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const thisYear = today.getFullYear();
+  return y === thisYear ? `${m}月${day}日` : `${y}年${m}月${day}日`;
+}
+
 function createFloatCard(cdId, x, y) {
   const c = appData.countdowns.find(x=>x.id===cdId);
   if (!c) return;
@@ -2858,11 +3091,12 @@ function createFloatCard(cdId, x, y) {
   div.id = 'cd-float-'+cdId;
   div.style.left = x+'px';
   div.style.top  = y+'px';
+  const dateStr = cdDateStr(c);
   div.innerHTML = `
     <div class="cd-float-dot" style="background:${c.color}"></div>
     <button class="cd-float-del" onclick="unpinCard('${c.id}')">✕</button>
-    <div class="cd-float-days ${cls}">${num}<span class="cd-float-unit">${unit}</span></div>
-    <div class="cd-float-name">${c.name}</div>`;
+    <div class="cd-float-days ${cls}" title="${c.name} — ${dateStr}">${num}<span class="cd-float-unit">${unit}</span></div>
+    <div class="cd-float-name" title="${c.name} — ${dateStr}">${c.name}</div>`;
 
   // 拖拽
   let ox, oy, dragging=false;
@@ -2973,7 +3207,7 @@ function renderCdAllList() {
     return `<div class="cd-item">
       <div class="cd-dot" style="background:${c.color}"></div>
       <div class="cd-info">
-        <div class="cd-name">${c.name}</div>
+        <div class="cd-name-row"><span class="cd-name">${c.name}</span><span class="cd-date">${cdDateStr(c)}</span></div>
         <div class="cd-days ${cls}">${daysTxt}</div>
       </div>
       <button class="cd-pin-btn ${isPinned?'pinned':''}" onclick="${isPinned?`unpinCard('${c.id}')`:`pinCard('${c.id}')`}">${isPinned?'收回':'悬浮'}</button>
