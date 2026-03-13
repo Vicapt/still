@@ -168,8 +168,8 @@
   --note-bg:rgba(255,255,255,0.6);--note-b:rgba(100,140,160,0.15);
   --overlay:rgba(160,190,210,0.65);--overlay-deep:rgba(140,175,200,0.82);
   --city-glow:rgba(140,200,160,0.22);
-  --rain-color:rgba(60,120,190,0.55);
-  --rain-drop-color:rgba(60,120,190,0.65);
+  --rain-color:rgba(60,120,190,0.72);
+  --rain-drop-color:rgba(60,120,190,0.82);
   --cd-float-bg:rgba(235,247,252,0.96);
   --divider:rgba(80,110,140,0.18);
   --input-bg:rgba(255,255,255,0.65);--input-bg2:rgba(255,255,255,0.72);
@@ -1110,6 +1110,7 @@ body,html{height:100%;overflow:hidden;color:var(--txt);font-family:'DM Sans',san
 <div class="journal-drawer" id="js-journal-drawer">
   <div class="journal-header">
     <div class="journal-title">手账</div>
+    <span style="font-size:0.55rem;opacity:0.28;letter-spacing:0.5px;margin-left:8px;align-self:flex-end;padding-bottom:2px">每日 02:00 刷新</span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="journal-tabs">
         <button class="journal-tab active" id="js-jt-today" onclick="journalShowToday()">今日</button>
@@ -1563,7 +1564,10 @@ let appData = (() => {
 let apiKey = localStorage.getItem('StILL_API_KEY') || '';
 let currentPlatform = detectPlatform(apiKey);
 
-function todayKey() { return new Date().toISOString().slice(0,10); }
+function todayKey() {
+  const d = new Date(Date.now() - 2 * 60 * 60 * 1000); // 凌晨2点前仍算昨天
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
 
 function recordTodayHistory() {
   const tk = todayKey();
@@ -2802,11 +2806,8 @@ function toggleMusic() {
   if (musicPlaying) pauseMusic(); else playMusic();
 }
 
-// Auto-advance to next track
-musicAudio.addEventListener('ended', () => {
-  loadTrack(currentTrackIdx + 1);
-  setTimeout(playMusic, 80);
-});
+// 单曲循环
+musicAudio.loop = true;
 
 document.getElementById('js-play-btn').onclick = toggleMusic;
 
